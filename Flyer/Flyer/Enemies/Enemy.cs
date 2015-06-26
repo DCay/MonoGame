@@ -45,22 +45,6 @@ namespace Flyer.Enemies
                 {
                     throw new ArgumentOutOfRangeException("The enemy location X and Y shoud be between 0 and 5000");
                 }
-                //if (value.X > 0 && value.X < 2500)
-                //{
-                //    location.X = rand.Next(0, 2000);
-                //}
-                //else
-                //{
-                //    location.X = rand.Next(3000, 5000);
-                //}
-                //if (value.Y > 0 && value.Y < 2500)
-                //{
-                //    location.Y = rand.Next(0, 2000);
-                //}
-                //else
-                //{
-                //    location.Y = rand.Next(3000, 5000);
-                //}
                 this.location = value;
             }
         }

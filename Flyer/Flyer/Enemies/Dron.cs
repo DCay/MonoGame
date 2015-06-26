@@ -12,7 +12,7 @@ namespace Flyer.Enemies
         //Texture2D dronTexture;
 
         public Dron(Texture2D texture)
-            : base(5, 1, texture)
+            : base(3, 1, texture)
         {
         }
 
