@@ -5,6 +5,7 @@ using Flyer.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Flyer.Enemies;
 
 namespace Flyer
 {
@@ -27,6 +28,12 @@ namespace Flyer
         private int universalReload = 0;//some junkdata
         private Camera camera;
         private KeyboardState currentState,previousState;
+
+        /// <summary>
+        /// EENEMY DATA
+        /// </summary>
+        private Texture2D droneTexture;
+        private Dron newDrone;
 
         public Engine()
         {
@@ -72,6 +79,10 @@ namespace Flyer
             projectileTexture = Content.Load<Texture2D>("images/projectile");
             
             coordinate_font = Content.Load<SpriteFont>("coordinate_font");    
+
+            //ENEMY DATA
+            droneTexture = Content.Load<Texture2D>("images/drone");
+            newDrone = new Dron(droneTexture);
         }
 
         /// <summary>
@@ -94,6 +105,7 @@ namespace Flyer
                 Exit();
             camera.Position = newShip.location;
             PlayInput();
+            newDrone.Update();
             //CAMERA MOVEMENT
             previousState = currentState;
             currentState = Keyboard.GetState();
@@ -114,6 +126,8 @@ namespace Flyer
             spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
             fuelEngine.Draw(spriteBatch);
             newShip.Draw(spriteBatch);
+            newDrone.Draw(spriteBatch);
+
             for (int i = 0; i < ship_projectiles.Count; i++)
             {
                 ship_projectiles[i].Draw(spriteBatch);   

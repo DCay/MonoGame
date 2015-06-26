@@ -39,6 +39,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Enemies\Dron.cs" />
+    <Compile Include="Enemies\Enemy.cs" />
     <Compile Include="Enums\Direction.cs" />
     <Compile Include="Projectiles\Ship_Projectile1.cs" />
     <Compile Include="Ship_Fuel\BurnedFuel.cs" />
@@ -62,7 +64,6 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Enemies\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
