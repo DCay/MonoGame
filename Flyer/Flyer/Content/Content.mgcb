@@ -151,7 +151,7 @@
 /processorParam:TextureFormat=Compressed
 /build:coordinate_font.spritefont
 
-#begin images/background2.jpg
+#begin images/background3.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -160,5 +160,5 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:TextureFormat=Color
-/build:images/background2.jpg
+/build:images/background3.jpg
 

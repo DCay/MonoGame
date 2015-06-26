@@ -15,6 +15,15 @@ namespace Flyer
         public Vector2 location = new Vector2(2500,2500);
         public float ship_angle { get; set; }
         public Direction ShipDirection = Direction.Up;
+        public Direction directionWhenShot;
+
+        public Vector2 Origin
+        {
+            get
+            {
+                return new Vector2(Texture.Width/2.0f,Texture.Height/2.0f);
+            }
+        }
 
         public Ship(Texture2D texture, float shipAngle)
         {

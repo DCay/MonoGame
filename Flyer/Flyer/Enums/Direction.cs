@@ -11,5 +11,10 @@ namespace Flyer.Enums
         Down,
         Left,
         Right,
+        //DIAGONALS
+        UpRight,
+        UpLeft,
+        DownRight,
+        DownLeft,
     }
 }
