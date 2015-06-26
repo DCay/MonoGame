@@ -103,7 +103,7 @@ namespace Flyer
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            camera.Position = newShip.location;
+            camera.Position = newDrone.Location;
             PlayInput();
             newDrone.Update();
             //CAMERA MOVEMENT
