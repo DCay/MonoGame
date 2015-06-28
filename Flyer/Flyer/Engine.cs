@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Flyer.Enemies;
 using Flyer.Enums;
 using Flyer.Projectiles;
 using Microsoft.Xna.Framework;
@@ -35,8 +36,6 @@ namespace Flyer
         private Camera camera;
         private KeyboardState currentState,previousState;
 
-<<<<<<< HEAD
-=======
         /// <summary>
         /// EENEMY DATA
         /// </summary>
@@ -44,7 +43,6 @@ namespace Flyer
         private List<Dron> newDrones;
         private int droneIndex=200;
 
->>>>>>> 6639941dcf2c62c46e46199d48d4c73b4ed59784
         public Engine()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -90,8 +88,6 @@ namespace Flyer
             projectileTexture = Content.Load<Texture2D>("images/projectile");
             
             coordinate_font = Content.Load<SpriteFont>("coordinate_font");    
-<<<<<<< HEAD
-=======
 
             //ENEMY DATA
             droneTexture = Content.Load<Texture2D>("images/drone");
@@ -112,7 +108,6 @@ namespace Flyer
             {
 
             }
->>>>>>> 6639941dcf2c62c46e46199d48d4c73b4ed59784
         }
 
         /// <summary>
@@ -163,14 +158,11 @@ namespace Flyer
             spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
             fuelEngine.Draw(spriteBatch);
             newShip.Draw(spriteBatch);
-<<<<<<< HEAD
-=======
             for (int i = 0; i < newDrones.Count; i++)
             {
                 newDrones[i].Draw(spriteBatch);   
             }
 
->>>>>>> 6639941dcf2c62c46e46199d48d4c73b4ed59784
             for (int i = 0; i < ship_projectiles.Count; i++)
             {
                 ship_projectiles[i].Draw(spriteBatch);   
