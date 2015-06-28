@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Flyer.Enums;
 using Flyer.Projectiles;
@@ -17,17 +18,33 @@ namespace Flyer
         SpriteBatch spriteBatch;
 
         private FuelEngine fuelEngine;
+        
         private Texture2D background;
+        
         private Ship newShip;
+        
         private List<Ship_Projectile1> ship_projectiles; 
         private Texture2D projectileTexture;
         private int projectile_index=0;
+        
         private SpriteFont coordinate_font;
         private bool coordinate_Show = false;
+        
         private int universalReload = 0;//some junkdata
+        
         private Camera camera;
         private KeyboardState currentState,previousState;
 
+<<<<<<< HEAD
+=======
+        /// <summary>
+        /// EENEMY DATA
+        /// </summary>
+        private Texture2D droneTexture;
+        private List<Dron> newDrones;
+        private int droneIndex=200;
+
+>>>>>>> 6639941dcf2c62c46e46199d48d4c73b4ed59784
         public Engine()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -47,6 +64,7 @@ namespace Flyer
             camera = new Camera(GraphicsDevice.Viewport,new Vector2(graphics.PreferredBackBufferWidth/2,graphics.PreferredBackBufferHeight/2));
             currentState = Keyboard.GetState();
             ship_projectiles = new List<Ship_Projectile1>();
+            newDrones = new List<Dron>();
             base.Initialize();
         }
 
@@ -72,6 +90,29 @@ namespace Flyer
             projectileTexture = Content.Load<Texture2D>("images/projectile");
             
             coordinate_font = Content.Load<SpriteFont>("coordinate_font");    
+<<<<<<< HEAD
+=======
+
+            //ENEMY DATA
+            droneTexture = Content.Load<Texture2D>("images/drone");
+            for (int i = 0; i < droneIndex; i++)
+            {
+                Dron nextDron = new Dron(droneTexture);
+
+                if ((nextDron.Location.X - newShip.location.X) * (nextDron.Location.X - newShip.location.X) +
+                    (nextDron.Location.Y - newShip.location.Y) * (nextDron.Location.Y - newShip.location.Y) > 2000000)
+                {
+                    newDrones.Add(nextDron);
+                    //newDrones.Remove(newDrones[i]);
+                    //droneIndex--;
+                }
+            }
+
+            for (int i = 0; i < droneIndex; i++)
+            {
+
+            }
+>>>>>>> 6639941dcf2c62c46e46199d48d4c73b4ed59784
         }
 
         /// <summary>
@@ -100,6 +141,14 @@ namespace Flyer
             camera.Update(gameTime,currentState,previousState);
             //END CAMERA MOVEMENT
 
+            //DRONE FACTORY
+            for (int i = 0; i < newDrones.Count; i++)
+            {
+                newDrones[i].Update();
+            }
+            
+            //END
+
             base.Update(gameTime);
         }
 
@@ -114,6 +163,14 @@ namespace Flyer
             spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
             fuelEngine.Draw(spriteBatch);
             newShip.Draw(spriteBatch);
+<<<<<<< HEAD
+=======
+            for (int i = 0; i < newDrones.Count; i++)
+            {
+                newDrones[i].Draw(spriteBatch);   
+            }
+
+>>>>>>> 6639941dcf2c62c46e46199d48d4c73b4ed59784
             for (int i = 0; i < ship_projectiles.Count; i++)
             {
                 ship_projectiles[i].Draw(spriteBatch);   
