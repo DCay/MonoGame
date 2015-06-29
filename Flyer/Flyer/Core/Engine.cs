@@ -5,6 +5,7 @@ using Flyer.Core;
 using Flyer.Enemies;
 using Flyer.Enums;
 using Flyer.Factories;
+using Flyer.Interfaces;
 using Flyer.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,8 +34,11 @@ namespace Flyer
         private bool coordinate_Show = false;
         
         //PROJECTILE DATA
-        private List<Ship_Projectile1> ship_projectiles; 
+        private List<IProjectile> shipProjectiles; 
         private Texture2D projectileTexture;
+        private Texture2D bulletTexture;
+        private Texture2D laserTexture;
+        private Texture2D plasmaTexture;
         private int projectile_index=0;
 
         //CAMERA DATA
@@ -75,7 +79,7 @@ namespace Flyer
             currentState = Keyboard.GetState();
             camera.cameraY = 2500;
             camera.cameraX = 2500;
-            ship_projectiles = new List<Ship_Projectile1>();
+            shipProjectiles = new List<IProjectile>();
             newDrones = new List<Dron>();
             base.Initialize();
         }
@@ -101,6 +105,8 @@ namespace Flyer
             
             //PROJECTILE DATA
             projectileTexture = Content.Load<Texture2D>("images/projectile");
+            plasmaTexture = Content.Load<Texture2D>("images/plasma");
+            laserTexture = Content.Load<Texture2D>("images/laser");
 
             explosionTexture = Content.Load<Texture2D>("images/explosion");
 
@@ -172,9 +178,9 @@ namespace Flyer
                 newDrones[i].Draw(spriteBatch);   
             }
 
-            for (int i = 0; i < ship_projectiles.Count; i++)
+            for (int i = 0; i < shipProjectiles.Count; i++)
             {
-                ship_projectiles[i].Draw(spriteBatch);   
+                shipProjectiles[i].Draw(spriteBatch);   
             }
             spriteBatch.End();
             spriteBatch.Begin();
@@ -352,19 +358,18 @@ namespace Flyer
                 if (state.IsKeyDown(Keys.Space))
                 {
                     newShip.directionWhenShot = newShip.ShipDirection;
-                    ship_projectiles.Add(new Ship_Projectile1(projectileTexture, newShip.location, false));
-                    ship_projectiles[projectile_index].Projectile_IsShot = true;
-                    ship_projectiles[projectile_index].direction = newShip.directionWhenShot;
+                    shipProjectiles.Add(new ShipProjectile(projectileTexture,newShip.location,newShip.directionWhenShot,
+                        newShip.ship_angle));
                     projectile_index++;
                 }
                 universalReload = 0;
             }
-            for (int i = 0; i < ship_projectiles.Count; i++)
+            for (int i = 0; i < shipProjectiles.Count; i++)
             {
-                ship_projectiles[i].Update(ship_projectiles[i].direction, newShip.location);
-                if (ship_projectiles[i].ToDraw == false)
+                shipProjectiles[i].Update();
+                if (shipProjectiles[i].ToDraw == false)
                 {
-                    ship_projectiles.Remove(ship_projectiles[i]);
+                    shipProjectiles.Remove(shipProjectiles[i]);
                     projectile_index--;
                 }
             }
@@ -373,7 +378,7 @@ namespace Flyer
         //BATTLE STATUS
         public void CheckBattleStats()
         {
-            int index = BattleManager.CheckHitStatus(ship_projectiles, newDrones);
+            int index = BattleManager.CheckHitStatus(shipProjectiles, newDrones);
             if (index != -1)
             {
                 playerScore += 10;
