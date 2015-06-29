@@ -49,6 +49,7 @@ namespace Flyer
 
         public void Update(KeyboardState state)
         {
+            if(this.PlayerHP<=0)Environment.Exit(0);
             //MOVEMENT
             if (state.IsKeyDown(Keys.W)
                 && state.IsKeyUp(Keys.S)

@@ -29,5 +29,21 @@ namespace Flyer.Core
             }
             return -1;
         }
+
+        public static int CheckCollisionStatus(Ship player, List<Dron> drones)
+        {
+            for (int i = 0; i < drones.Count; i++)
+            {
+                if ((player.location.X >= drones[i].Location.X - drones[i].Texture.Width/2)
+                    && (player.location.X <= drones[i].Location.X + drones[i].Texture.Width/2)
+                    && (player.location.Y >= drones[i].Location.Y - drones[i].Texture.Height/2)
+                    && (player.location.Y <= drones[i].Location.Y + drones[i].Texture.Height/2)
+                    )
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
     }
 }

@@ -162,7 +162,6 @@ namespace Flyer
             
             //END
             Outsiders.Update(state);
-
             base.Update(gameTime);
         }
 
@@ -206,7 +205,22 @@ namespace Flyer
                 explosionLocation = new Vector2((newDrones[index].Location.X - newDrones[index].Texture.Width)
                     , (newDrones[index].Location.Y - newDrones[index].Texture.Height));
                 newDrones.Remove(newDrones[index]);
+                index = -1;
             }
+            int index2 = BattleManager.CheckCollisionStatus(newShip, newDrones);
+            if(index2!=-1)
+            {
+                playerScore += 10;
+                explosionDraw = true;
+                explosionTimer = 0;
+                explosionLocation = new Vector2((newDrones[index2].Location.X - newDrones[index2].Texture.Width)
+                    , (newDrones[index2].Location.Y - newDrones[index2].Texture.Height));
+                newDrones.Remove(newDrones[index2]);
+                newShip.PlayerHP -= 20;
+                index2 = -1;
+            }
+            redBarIndex = (195 * newShip.PlayerHP) / 100;
+            blueBarIndex = (190 * newShip.PlayerShields) / 200;
         }
         //EXPLOSIONS
         public void ExplosionDraw(SpriteBatch spriteBatch)

@@ -23,6 +23,14 @@ namespace Flyer.Enemies
         {
             this.location.X -= (float)(this.Speed * Math.Cos(this.EnemyAngle));
             this.location.Y -= (float)(this.Speed * Math.Sin(this.EnemyAngle));
+            if (this.location.X < -1 || this.location.X > 5001)
+            {
+                this.EnemyAngle--;
+            }
+            if (this.location.Y < -1 || this.location.Y > 5001)
+            {
+                this.EnemyAngle--;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
