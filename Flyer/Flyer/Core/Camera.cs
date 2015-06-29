@@ -90,15 +90,46 @@ namespace Flyer
 
 
                 Vector2 movement = Vector2.Zero;
-                if (current.IsKeyDown(Keys.Up))
-                    movement.Y -= 10.0f/Zoom;
-                if (current.IsKeyDown(Keys.Down))
-                    movement.Y += 10.0f / Zoom;
-                if (current.IsKeyDown(Keys.Left))
-                    movement.X -= 10.0f / Zoom;
-                if (current.IsKeyDown(Keys.Right))
-                    movement.X += 10.0f / Zoom;
-
+                if (current.IsKeyDown(Keys.W)
+                    && current.IsKeyUp(Keys.A)
+                    && current.IsKeyUp(Keys.S)
+                    && current.IsKeyUp(Keys.D))
+                    this.cameraY -= 10.0f/Zoom;
+                if (current.IsKeyDown(Keys.S)
+                    && current.IsKeyUp(Keys.A)
+                    && current.IsKeyUp(Keys.W)
+                    && current.IsKeyUp(Keys.D))
+                    this.cameraY += 10.0f / Zoom;
+                if (current.IsKeyDown(Keys.A)
+                    && current.IsKeyUp(Keys.W)
+                    && current.IsKeyUp(Keys.S)
+                    && current.IsKeyUp(Keys.D))
+                    this.cameraX -= 10.0f / Zoom;
+                if (current.IsKeyDown(Keys.D)
+                    && current.IsKeyUp(Keys.A)
+                    && current.IsKeyUp(Keys.S)
+                    && current.IsKeyUp(Keys.W))
+                    this.cameraX += 10.0f / Zoom;
+                if (current.IsKeyDown(Keys.S) && current.IsKeyDown(Keys.D) && current.IsKeyUp(Keys.A))
+                {
+                    this.cameraX += 7.5f / Zoom;
+                    this.cameraY += 7.5f / Zoom;
+                }
+                if (current.IsKeyDown(Keys.S) && current.IsKeyDown(Keys.A) && current.IsKeyUp(Keys.D))
+                {
+                    this.cameraX -= 7.5f / Zoom;
+                    this.cameraY += 7.5f / Zoom;
+                }
+                if (current.IsKeyDown(Keys.W) && current.IsKeyDown(Keys.A) && current.IsKeyUp(Keys.D))
+                {
+                    this.cameraX -= 7.5f / Zoom;
+                    this.cameraY -= 7.5f / Zoom;
+                }
+                if (current.IsKeyDown(Keys.W) && current.IsKeyDown(Keys.D) && current.IsKeyUp(Keys.A))
+                {
+                    this.cameraX += 7.5f / Zoom;
+                    this.cameraY -= 7.5f / Zoom;
+                }
                 Position = Vector2.Add(Position, movement);
             }
 
@@ -125,7 +156,5 @@ namespace Flyer
                 SavedRotation = Rotation;
             }
         }
-
-
     }
 }

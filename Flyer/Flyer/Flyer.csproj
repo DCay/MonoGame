@@ -40,11 +40,11 @@
   <ItemGroup>
     <Compile Include="Core\BattleManager.cs" />
     <Compile Include="Core\Camera.cs" />
+    <Compile Include="Core\Outsiders.cs" />
     <Compile Include="Enemies\Dron.cs" />
     <Compile Include="Enemies\Enemy.cs" />
     <Compile Include="Enums\Direction.cs" />
-    <Compile Include="Factories\EnemyFactory.cs" />
-    <Compile Include="Factories\ProjectileFactory.cs" />
+    <Compile Include="Enemies\EnemyFactory.cs" />
     <Compile Include="Interfaces\IProjectile.cs" />
     <Compile Include="Player\Ship.cs" />
     <Compile Include="Player\ShipFuel\BurnedFuel.cs" />

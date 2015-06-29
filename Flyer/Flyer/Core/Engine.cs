@@ -27,20 +27,15 @@ namespace Flyer
 
         //PLAYER DATA
         private Ship newShip;
-        private FuelEngine fuelEngine;
         private int playerScore=0;
         private SpriteFont score_font;    
         private SpriteFont coordinate_font;
-        private bool coordinate_Show = false;
-        
-        //PROJECTILE DATA
-        private List<IProjectile> shipProjectiles; 
-        private Texture2D projectileTexture;
+        private Texture2D playerHPbar;
+        private Texture2D playerShieldbar;
         private Texture2D bulletTexture;
         private Texture2D laserTexture;
         private Texture2D plasmaTexture;
-        private int projectile_index=0;
-
+        
         //CAMERA DATA
         private Camera camera;
         private KeyboardState currentState,previousState;
@@ -58,6 +53,11 @@ namespace Flyer
         private bool explosionDraw = false;
         private Vector2 explosionLocation;
         private int explosionTimer = 0;
+        private Texture2D redbar;
+        private Texture2D bluebar;
+        private double redBarIndex=195;
+        private double blueBarIndex = 190;
+
 
         public Engine()
         {
@@ -79,7 +79,6 @@ namespace Flyer
             currentState = Keyboard.GetState();
             camera.cameraY = 2500;
             camera.cameraX = 2500;
-            shipProjectiles = new List<IProjectile>();
             newDrones = new List<Dron>();
             base.Initialize();
         }
@@ -96,15 +95,18 @@ namespace Flyer
             
             //SHIP DATA
             Texture2D shipTexture = Content.Load<Texture2D>("images/ship");
-            newShip = new Ship(shipTexture,0);
             List<Texture2D> textures = new List<Texture2D>();
             textures.Add(Content.Load<Texture2D>("images/circle"));
             textures.Add(Content.Load<Texture2D>("images/star"));
             textures.Add(Content.Load<Texture2D>("images/diamond"));
-            fuelEngine = new FuelEngine(textures, new Vector2(2500, 2500));
-            
+            playerHPbar = Content.Load<Texture2D>("images/statbar");
+            playerShieldbar = playerHPbar;
+            redbar = Content.Load<Texture2D>("images/redline");
+            bluebar = Content.Load<Texture2D>("images/blueline");
+            newShip = new Ship(shipTexture, 0,textures);
+
             //PROJECTILE DATA
-            projectileTexture = Content.Load<Texture2D>("images/projectile");
+            bulletTexture = Content.Load<Texture2D>("images/projectile");
             plasmaTexture = Content.Load<Texture2D>("images/plasma");
             laserTexture = Content.Load<Texture2D>("images/laser");
 
@@ -118,6 +120,7 @@ namespace Flyer
             //ENEMY DATA
             droneTexture = Content.Load<Texture2D>("images/drone");
             EnemyFactory.Build(droneTexture, newDrones, newShip.location);
+            newShip.ProjectileTexture = bulletTexture;
         }
 
         /// <summary>
@@ -138,8 +141,9 @@ namespace Flyer
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            KeyboardState state = Keyboard.GetState();
             CameraCheck();
-            PlayInput();
+            newShip.Update(state);
             //CAMERA MOVEMENT
             previousState = currentState;
             currentState = Keyboard.GetState();
@@ -157,6 +161,7 @@ namespace Flyer
             }
             
             //END
+            Outsiders.Update(state);
 
             base.Update(gameTime);
         }
@@ -170,27 +175,18 @@ namespace Flyer
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin(SpriteSortMode.Deferred,BlendState.AlphaBlend,null,null,null,null,camera.Transform);
             spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
-            fuelEngine.Draw(spriteBatch);
             newShip.Draw(spriteBatch);
             ExplosionDraw(spriteBatch);
             for (int i = 0; i < newDrones.Count; i++)
             {
                 newDrones[i].Draw(spriteBatch);   
             }
-
-            for (int i = 0; i < shipProjectiles.Count; i++)
-            {
-                shipProjectiles[i].Draw(spriteBatch);   
-            }
             spriteBatch.End();
             spriteBatch.Begin();
-            if (coordinate_Show)
-            {
-                spriteBatch.DrawString(coordinate_font,"Ship.X - " + newShip.location.X,new Vector2(10, 10),Color.White);
-                spriteBatch.DrawString(coordinate_font, "Ship.Y - " + newShip.location.Y, new Vector2(10, 50), Color.White);
-                spriteBatch.DrawString(coordinate_font, "Enemies - " + newDrones.Count, new Vector2(10, 90), Color.White);
-            }
             spriteBatch.DrawString(score_font,"Score : " + playerScore,new Vector2(graphics.PreferredBackBufferWidth-150,20),Color.White);
+            //THE BULLSHIT METHOD !!!
+            Outsiders.Draw(spriteBatch,universalFont,newShip.location,playerHPbar,redbar,bluebar,redBarIndex,blueBarIndex);
+            //END OF BULLSHIT !!!
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -198,187 +194,10 @@ namespace Flyer
 
 
         //CUSTOM ENGINE METHODS
-        //CHAR MOVEMENT
-        public void PlayInput()
-        {
-            KeyboardState state = Keyboard.GetState();
-            // CHAR MOVEMENT
-            if (state.IsKeyDown(Keys.W)
-                && state.IsKeyUp(Keys.S)
-                && state.IsKeyUp(Keys.D)
-                && state.IsKeyUp(Keys.A))
-            {
-                fuelEngine.Build();
-                if (newShip.location.Y > 0)
-                {
-                    newShip.location.Y -= 10;
-                    camera.cameraY -= 10;
-                }
-                newShip.ship_angle = 0;
-                newShip.ShipDirection = Direction.Up;
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X, newShip.location.Y + 40);
-            }
-
-            if (state.IsKeyDown(Keys.D)
-                && state.IsKeyUp(Keys.W)
-                && state.IsKeyUp(Keys.S)
-                && state.IsKeyUp(Keys.A))
-            {
-                fuelEngine.Build();
-                if (newShip.location.X < 5000)
-                {
-                    newShip.location.X += 10;
-                    camera.cameraX += 10;
-                }
-                newShip.ship_angle = 1.575f;
-                newShip.ShipDirection = Direction.Right;
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X - 40, newShip.location.Y);
-            }
-
-            if (state.IsKeyDown(Keys.A)
-                && state.IsKeyUp(Keys.W)
-                && state.IsKeyUp(Keys.S)
-                && state.IsKeyUp(Keys.D))
-            {
-                fuelEngine.Build();
-                if (newShip.location.X > 0)
-                {
-                    newShip.location.X -= 10;
-                    camera.cameraX -= 10;
-                }
-                newShip.ship_angle = 4.725f;
-                newShip.ShipDirection = Direction.Left;
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X + 40, newShip.location.Y);
-            }
-
-            if (state.IsKeyDown(Keys.S)
-                && state.IsKeyUp(Keys.W)
-                && state.IsKeyUp(Keys.A)
-                && state.IsKeyUp(Keys.D))
-            {
-                fuelEngine.Build();
-                if (newShip.location.Y < 5000)
-                {
-                    newShip.location.Y += 10;
-                    camera.cameraY += 10;
-                }
-                newShip.ship_angle = 3.150f;
-                newShip.ShipDirection = Direction.Down;
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X, newShip.location.Y - 40);
-            }
-            if (universalReload < 15)
-            {
-                universalReload += 1;
-
-            }
-            //DIAGONAL MOVEMENT
-            if (state.IsKeyDown(Keys.W) && state.IsKeyDown(Keys.D) && state.IsKeyUp(Keys.A))
-            {
-                newShip.ShipDirection = Direction.UpRight;
-                newShip.ship_angle = 0.7875f;
-                if (newShip.location.Y > 0 && newShip.location.X < 5000)
-                {
-                    newShip.location.Y -= 7.5f;
-                    newShip.location.X += 7.5f;
-                    camera.cameraY -= 7.5f;
-                    camera.cameraX += 7.5f;
-                }
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X - 30, newShip.location.Y + 30);
-                fuelEngine.Build();
-            }
-
-            if (state.IsKeyDown(Keys.W) && state.IsKeyDown(Keys.A) && state.IsKeyUp(Keys.D))
-            {
-                newShip.ShipDirection = Direction.UpLeft;
-                newShip.ship_angle = 5.5075f;
-                if (newShip.location.Y > 0 && newShip.location.X > 0)
-                {
-                    newShip.location.Y -= 7.5f;
-                    newShip.location.X -= 7.5f;
-                    camera.cameraY -= 7.5f;
-                    camera.cameraX -= 7.5f;
-                }
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X + 30, newShip.location.Y + 30);
-                fuelEngine.Build();
-            }
-
-            if (state.IsKeyDown(Keys.S) && state.IsKeyDown(Keys.A) && state.IsKeyUp(Keys.D))
-            {
-                newShip.ShipDirection = Direction.DownLeft;
-                newShip.ship_angle = 3.9375f;
-                if (newShip.location.Y < 5000 && newShip.location.X > 0)
-                {
-                    newShip.location.Y += 7.5f;
-                    newShip.location.X -= 7.5f;
-                    camera.cameraY += 7.5f;
-                    camera.cameraX -= 7.5f;
-                }
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X + 30, newShip.location.Y - 30);
-                fuelEngine.Build();
-            }
-
-            if (state.IsKeyDown(Keys.S) && state.IsKeyDown(Keys.D) && state.IsKeyUp(Keys.A))
-            {
-                newShip.ShipDirection = Direction.DownRight;
-                newShip.ship_angle = 2.3625f;
-                if (newShip.location.Y < 5000 && newShip.location.X < 5000)
-                {
-                    newShip.location.Y += 7.5f;
-                    newShip.location.X += 7.5f;
-                    camera.cameraY += 7.5f;
-                    camera.cameraX += 7.5f;
-                }
-                fuelEngine.EmitterLocation = new Vector2(newShip.location.X - 30, newShip.location.Y - 30);
-                fuelEngine.Build();
-            }
-
-            if (state.IsKeyDown(Keys.F3))
-            {
-                if (universalReload >= 15)
-                {
-                    if (coordinate_Show)
-                    {
-                        coordinate_Show = false;
-                        universalReload = 0;
-
-                    }
-                    else
-                    {
-                        coordinate_Show = true;
-                        universalReload = 0;
-                    }
-                }
-            }
-            fuelEngine.Destroy();
-            //END CHAR MOVEMENT
-
-            //CHAR SHOTTING
-            if (universalReload >= 15)
-            {
-                if (state.IsKeyDown(Keys.Space))
-                {
-                    newShip.directionWhenShot = newShip.ShipDirection;
-                    shipProjectiles.Add(new ShipProjectile(projectileTexture,newShip.location,newShip.directionWhenShot,
-                        newShip.ship_angle));
-                    projectile_index++;
-                }
-                universalReload = 0;
-            }
-            for (int i = 0; i < shipProjectiles.Count; i++)
-            {
-                shipProjectiles[i].Update();
-                if (shipProjectiles[i].ToDraw == false)
-                {
-                    shipProjectiles.Remove(shipProjectiles[i]);
-                    projectile_index--;
-                }
-            }
-            //END CHAR SHOTTING
-        }
         //BATTLE STATUS
         public void CheckBattleStats()
         {
-            int index = BattleManager.CheckHitStatus(shipProjectiles, newDrones);
+            int index = BattleManager.CheckHitStatus(newShip.shipProjectiles, newDrones);
             if (index != -1)
             {
                 playerScore += 10;
