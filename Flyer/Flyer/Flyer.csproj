@@ -38,7 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Camera.cs" />
+    <Compile Include="Core\BattleManager.cs" />
+    <Compile Include="Core\Camera.cs" />
     <Compile Include="Enemies\Dron.cs" />
     <Compile Include="Enemies\Enemy.cs" />
     <Compile Include="Enums\Direction.cs" />
@@ -46,8 +47,8 @@
     <Compile Include="Player\ShipFuel\BurnedFuel.cs" />
     <Compile Include="Player\ShipFuel\FuelEngine.cs" />
     <Compile Include="Projectiles\Ship_Projectile1.cs" />
-    <Compile Include="Engine.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Core\Engine.cs" />
+    <Compile Include="Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

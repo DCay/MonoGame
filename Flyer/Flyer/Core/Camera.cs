@@ -37,7 +37,10 @@ namespace Flyer
 
         TimeSpan shakeTimer;
         Random random;
-        
+        public float cameraX = 0;
+        public float cameraY = 0;
+
+
         /// <summary>
         /// CONSTRUCTORS
         /// </summary>

@@ -101,12 +101,6 @@
 /processorParam:TextureFormat=Color
 /build:images/projectile.png
 
-#begin coordinate_font.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:coordinate_font.spritefont
-
 #begin images/background3.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -128,4 +122,21 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:TextureFormat=Color
 /build:images/drone.png
+
+#begin UniversalFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:UniversalFont.spritefont
+
+#begin images/explosion.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:TextureFormat=Color
+/build:images/explosion.png
 
