@@ -4,6 +4,7 @@ using System.Threading;
 using Flyer.Core;
 using Flyer.Enemies;
 using Flyer.Enums;
+using Flyer.Factories;
 using Flyer.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -110,16 +111,7 @@ namespace Flyer
             
             //ENEMY DATA
             droneTexture = Content.Load<Texture2D>("images/drone");
-            for (int i = 0; i < droneIndex; i++)
-            {
-                Dron nextDron = new Dron(droneTexture);
-
-                if (Math.Sqrt((nextDron.Location.X - newShip.location.X) * (nextDron.Location.X - newShip.location.X) +
-                    (nextDron.Location.Y - newShip.location.Y) * (nextDron.Location.Y - newShip.location.Y)) > 1400)
-                {
-                    newDrones.Add(nextDron);
-                }
-            }
+            EnemyFactory.Build(droneTexture, newDrones, newShip.location);
         }
 
         /// <summary>

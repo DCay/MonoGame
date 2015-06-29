@@ -33,12 +33,12 @@ namespace Flyer.Projectiles
                 case Direction.Up:
                     this.direction = Direction.Up;
                     this.location = location;
-                    this.location.X -= 12;
+                    this.location.X -= 14;
                     break;
                 case Direction.Down:
                     this.direction = Direction.Down;
                     this.location = location;
-                    this.location.X -= 13;
+                    this.location.X -= 14;
                     break;
                 case Direction.Right:
                     this.direction = Direction.Right;
@@ -48,7 +48,7 @@ namespace Flyer.Projectiles
                 case Direction.Left:
                     this.direction = Direction.Left;
                     this.location = location;
-                    this.location.Y -= 12;
+                    this.location.Y -= 14;
                     break;
                 //DIAGONALS
                 case Direction.UpLeft:

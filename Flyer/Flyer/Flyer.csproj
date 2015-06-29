@@ -43,6 +43,8 @@
     <Compile Include="Enemies\Dron.cs" />
     <Compile Include="Enemies\Enemy.cs" />
     <Compile Include="Enums\Direction.cs" />
+    <Compile Include="Factories\EnemyFactory.cs" />
+    <Compile Include="Factories\ProjectileFactory.cs" />
     <Compile Include="Player\Ship.cs" />
     <Compile Include="Player\ShipFuel\BurnedFuel.cs" />
     <Compile Include="Player\ShipFuel\FuelEngine.cs" />
