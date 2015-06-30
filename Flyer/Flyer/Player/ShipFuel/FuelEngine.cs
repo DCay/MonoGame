@@ -13,14 +13,16 @@ namespace Flyer
         private Random random;
         public Vector2 EmitterLocation { get; set; }
         private List<BurnedFuel> particles;
-        private List<Texture2D> textures;
+        public readonly List<Texture2D> textures;
+        public Color Color;
 
-        public FuelEngine(List<Texture2D> textures,Vector2 emitterLocation)
+        public FuelEngine(List<Texture2D> textures,Vector2 emitterLocation,Color color)
         {
             EmitterLocation = emitterLocation;
             this.random = new Random();
             this.particles = new List<BurnedFuel>();
             this.textures = textures;
+            this.Color = color;
         }
 
         public BurnedFuel Generator()
@@ -32,7 +34,6 @@ namespace Flyer
                 1f*(float)(random.NextDouble() * 2 - 1));
             float angle = 0;
             float angularVelocity = 0.1f*(float) (random.NextDouble()*2 - 1);
-            Color color = Color.OrangeRed;
             //Color color = new Color(
             //    (float)random.NextDouble(),
             //    (float)random.NextDouble(),
@@ -40,7 +41,7 @@ namespace Flyer
             float size = (float)random.NextDouble();
             int lifespan = 15 + random.Next(40);
 
-            return new BurnedFuel(texture, position, velocity, angle, angularVelocity, color, size, lifespan);
+            return new BurnedFuel(texture, position, velocity, angle, angularVelocity, Color, size, lifespan);
         }
 
         public void Update()

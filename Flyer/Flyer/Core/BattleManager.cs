@@ -23,6 +23,7 @@ namespace Flyer.Core
                         && (projectiles[j].Location.Y <= drones[i].Location.Y + drones[i].Texture.Height / 2)
                         )
                     {
+                        projectiles.Remove(projectiles[j]);
                         return i;
                     }
                 }

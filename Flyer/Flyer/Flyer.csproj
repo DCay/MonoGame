@@ -38,6 +38,7 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Bonuses\WeaponUpgrade.cs" />
     <Compile Include="Core\BattleManager.cs" />
     <Compile Include="Core\Camera.cs" />
     <Compile Include="Core\Outsiders.cs" />
@@ -49,11 +50,11 @@
     <Compile Include="Player\Ship.cs" />
     <Compile Include="Player\ShipFuel\BurnedFuel.cs" />
     <Compile Include="Player\ShipFuel\FuelEngine.cs" />
+    <Compile Include="Projectiles\Bullet.cs" />
     <Compile Include="Projectiles\Laser.cs" />
     <Compile Include="Projectiles\PlasmaProjectile.cs" />
     <Compile Include="Projectiles\Projectile.cs" />
     <Compile Include="Projectiles\ShipProjectile.cs" />
-    <Compile Include="Projectiles\Ship_Projectile1.cs" />
     <Compile Include="Core\Engine.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Flyer.Enums;
 using Flyer.Interfaces;
+using Flyer.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -24,7 +25,8 @@ namespace Flyer
 
         //PROJECTILE DATA
         public List<IProjectile> shipProjectiles= new List<IProjectile>();
-        public Texture2D ProjectileTexture; 
+        public Texture2D ProjectileTexture;
+        public string ProjectileType="bullet";
 
         //JUNK DATA
         private int detailsReload = 0;
@@ -44,7 +46,7 @@ namespace Flyer
             ship_angle = shipAngle;
             this.PlayerHP = 100;
             this.PlayerShields = 200;
-            fuelEngine = new FuelEngine(fuelEngineTexture,new Vector2(2500, 2500));
+            fuelEngine = new FuelEngine(fuelEngineTexture,new Vector2(2500, 2500),Color.OrangeRed);
         }
 
         public void Update(KeyboardState state)
@@ -171,8 +173,21 @@ namespace Flyer
                 if (state.IsKeyDown(Keys.Space))
                 {
                     this.directionWhenShot = this.ShipDirection;
-                    shipProjectiles.Add(new ShipProjectile(ProjectileTexture, this.location, this.directionWhenShot,
-                        this.ship_angle));
+                    switch (this.ProjectileType)
+                    {
+                        case "bullet":
+                            shipProjectiles.Add(new Bullet(ProjectileTexture, this.location, 
+                                this.directionWhenShot,this.ship_angle));
+                            break;
+                        case "laser":
+                            shipProjectiles.Add(new Laser(ProjectileTexture, this.location,
+                                this.directionWhenShot, this.ship_angle));
+                            break;
+                        case "plasma":
+                            shipProjectiles.Add(new PlasmaProjectile(ProjectileTexture, this.location,
+                                this.directionWhenShot, this.ship_angle));
+                            break;
+                    }
                 }
                 detailsReload = 0;
             }

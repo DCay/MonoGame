@@ -13,7 +13,7 @@ namespace Flyer.Projectiles
     {
         public Laser(Texture2D texture, Vector2 location, Direction direction, float angle) : base(texture, location, direction, angle)
         {
-            this.speed = 90;
+            this.speed = 50;
         }
     }
 }

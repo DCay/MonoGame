@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Flyer.Bonuses;
 using Flyer.Core;
 using Flyer.Enemies;
 using Flyer.Enums;
@@ -32,9 +33,9 @@ namespace Flyer
         private SpriteFont coordinate_font;
         private Texture2D playerHPbar;
         private Texture2D playerShieldbar;
-        private Texture2D bulletTexture;
-        private Texture2D laserTexture;
-        private Texture2D plasmaTexture;
+        public Texture2D bulletTexture;
+        public Texture2D laserTexture;
+        public Texture2D plasmaTexture;
         
         //CAMERA DATA
         private Camera camera;
@@ -46,6 +47,10 @@ namespace Flyer
         private Texture2D droneTexture;
         private List<Dron> newDrones;
         private int droneIndex=200;
+
+        //BONUS DATA
+        private Texture2D upgradeTexture;
+        private List<WeaponUpgrade> upgrades; 
 
         //JUNK DATA
         private int universalReload = 0;
@@ -80,6 +85,7 @@ namespace Flyer
             camera.cameraY = 2500;
             camera.cameraX = 2500;
             newDrones = new List<Dron>();
+            upgrades=new List<WeaponUpgrade>();
             base.Initialize();
         }
 
@@ -106,11 +112,14 @@ namespace Flyer
             newShip = new Ship(shipTexture, 0,textures);
 
             //PROJECTILE DATA
-            bulletTexture = Content.Load<Texture2D>("images/projectile");
+            bulletTexture = Content.Load<Texture2D>("images/bullet");
             plasmaTexture = Content.Load<Texture2D>("images/plasma");
             laserTexture = Content.Load<Texture2D>("images/laser");
 
             explosionTexture = Content.Load<Texture2D>("images/explosion");
+
+            //BONUS DATA
+            upgradeTexture = Content.Load<Texture2D>("images/weaponupgrade");
 
             //FONT DATA
             universalFont = Content.Load<SpriteFont>("UniversalFont");
@@ -152,6 +161,7 @@ namespace Flyer
 
             //BATTLE STATUS CHECK
             CheckBattleStats();
+            UpgradeCheck();
             //END
 
             //DRONE FACTORY
@@ -176,6 +186,10 @@ namespace Flyer
             spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
             newShip.Draw(spriteBatch);
             ExplosionDraw(spriteBatch);
+            for (int i = 0; i < upgrades.Count; i++)
+            {
+                upgrades[i].Draw(spriteBatch);
+            }
             for (int i = 0; i < newDrones.Count; i++)
             {
                 newDrones[i].Draw(spriteBatch);   
@@ -196,17 +210,38 @@ namespace Flyer
         //BATTLE STATUS
         public void CheckBattleStats()
         {
+            //SHOT
             int index = BattleManager.CheckHitStatus(newShip.shipProjectiles, newDrones);
+            Random chanceToDrop = new Random();
             if (index != -1)
             {
                 playerScore += 10;
+                
+                //EXPLOSION
                 explosionDraw = true;
                 explosionTimer = 0;
                 explosionLocation = new Vector2((newDrones[index].Location.X - newDrones[index].Texture.Width)
                     , (newDrones[index].Location.Y - newDrones[index].Texture.Height));
+                
+                //LOOT
+                int isDroped = chanceToDrop.Next(20);
+                switch (isDroped)
+                {
+                    case 1:
+                        upgrades.Add(new WeaponUpgrade(upgradeTexture,newDrones[index].Location));
+                        break;
+                    case 8:
+                        break;
+                    default:
+                        break;
+                }
+
+                //END LOOT
+                
                 newDrones.Remove(newDrones[index]);
                 index = -1;
             }
+            //COLLISION
             int index2 = BattleManager.CheckCollisionStatus(newShip, newDrones);
             if(index2!=-1)
             {
@@ -257,6 +292,24 @@ namespace Flyer
                 camera.cameraY = (graphics.PreferredBackBufferHeight / 2);
             }
             camera.Position = new Vector2(camera.cameraX, camera.cameraY);
+        }
+        //UPGRADE CHECK
+        public void UpgradeCheck()
+        {
+            for (int i = 0; i < upgrades.Count; i++)
+            {
+                if ((newShip.location.X >= upgrades[i].Location.X - upgrades[i].Texture.Width / 2)
+                    && (newShip.location.X <= upgrades[i].Location.X + upgrades[i].Texture.Width / 2)
+                    && (newShip.location.Y >= upgrades[i].Location.Y - upgrades[i].Texture.Height / 2)
+                    && (newShip.location.Y <= upgrades[i].Location.Y + upgrades[i].Texture.Height / 2)
+                    )
+                {
+                    newShip.ProjectileType = upgrades[i].Upgrade(newShip.ProjectileType);
+                    upgrades.Remove(upgrades[i]);
+                }
+                if (newShip.ProjectileType == "laser") newShip.ProjectileTexture = laserTexture;
+                if (newShip.ProjectileType == "plasma") newShip.ProjectileTexture = plasmaTexture;
+            }
         }
     }
 }

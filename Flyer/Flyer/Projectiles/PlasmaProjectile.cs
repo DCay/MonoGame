@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using Flyer.Enums;
 using Flyer.Interfaces;
@@ -16,7 +17,5 @@ namespace Flyer.Projectiles
         {
             this.speed = 30;
         }
-
-
     }
 }
