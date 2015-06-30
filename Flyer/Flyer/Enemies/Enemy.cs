@@ -17,8 +17,8 @@ namespace Flyer.Enemies
         private int hitPoints;
         private double speed;
         static Random rand = new Random();
-        protected Vector2 location = new Vector2(rand.Next(0, 5000), rand.Next(0, 5000));
-        protected List<EnemyProjectile> projectiles;
+        public Vector2 location = new Vector2(rand.Next(0, 5000), rand.Next(0, 5000));
+        public List<EnemyProjectile> projectiles;
         private int reload=0;
         //private int initalX = rand.Next(0, 200);
 
@@ -58,7 +58,8 @@ namespace Flyer.Enemies
         public float EnemyAngle { get; set; }
 
         public virtual void Update(Vector2 target)
-        {   
+        {
+            projectileIndex = projectiles.Count;
             this.location.X -= (float)(this.Speed * Math.Cos(this.EnemyAngle));
             this.location.Y -= (float)(this.Speed * Math.Sin(this.EnemyAngle));
             if (this.location.X < -1 || this.location.X > 5001)
@@ -84,7 +85,6 @@ namespace Flyer.Enemies
             }
             for (int i = 0; i < projectileIndex; i++)
             {
-
                 this.projectiles[i].Update();
                 if(this.projectiles[i].isAlive==false)
                 {

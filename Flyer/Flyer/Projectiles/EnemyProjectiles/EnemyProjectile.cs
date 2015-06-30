@@ -47,7 +47,6 @@ namespace Flyer.Projectiles.EnemyProjectiles
             this.location.X += (float)(this.Speed * Math.Cos(this.Angle));
             this.location.Y -= (float)(this.Speed * Math.Sin(this.Angle));
             if (this.location.X > 5001 || this.location.Y > 5001) this.isAlive = false;
-
         }
 
     }

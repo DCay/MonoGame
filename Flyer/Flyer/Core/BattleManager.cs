@@ -5,6 +5,7 @@ using System.Text;
 using Flyer.Enemies;
 using Flyer.Interfaces;
 using Flyer.Projectiles;
+using Flyer.Projectiles.EnemyProjectiles;
 using Microsoft.Xna.Framework;
 
 namespace Flyer.Core
@@ -45,6 +46,30 @@ namespace Flyer.Core
                 }
             }
             return -1;
+        }
+
+        public static void CheckIfShipHit(List<EnemyProjectile> projectiles, Ship player)
+        {
+            for (int i = 0; i < projectiles.Count; i++)
+            {
+                if (projectiles[i].Location.X >= player.sourceRectangle.Left - 20 + player.location.X
+                    && projectiles[i].Location.X <= player.sourceRectangle.Right/2 + player.location.X
+                    && projectiles[i].Location.Y >= player.sourceRectangle.Top - 20 + player.location.Y
+                    && projectiles[i].Location.Y <= player.sourceRectangle.Bottom/2 + player.location.Y)
+                {
+                    if (player.PlayerShields < 0)
+
+                    {
+                        player.PlayerHP -= 10;
+                    }
+                    else
+                    {
+                        player.PlayerShields -= 10;
+                    }
+                    projectiles.Remove(projectiles[i]);
+                    return;
+                }
+            }
         }
     }
 }

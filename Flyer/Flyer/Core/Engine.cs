@@ -271,6 +271,10 @@ namespace Flyer
             }
             redBarIndex = (195 * newShip.PlayerHP) / 100;
             blueBarIndex = (190 * newShip.PlayerShields) / 200;
+            for (int i = 0; i < newMines.Count; i++)
+            {
+                BattleManager.CheckIfShipHit(newMines[i].projectiles,newShip);   
+            }
         }
         //EXPLOSIONS
         public void ExplosionDraw(SpriteBatch spriteBatch)

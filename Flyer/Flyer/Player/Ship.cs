@@ -202,9 +202,11 @@ namespace Flyer
             //END CHAR SHOTTING
         }
 
+        public Rectangle sourceRectangle;
+
         public void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle sourceRectangle = new Rectangle(0,0,Texture.Width,Texture.Height);
+            sourceRectangle = new Rectangle(0, 0, Texture.Width, Texture.Height);
             Vector2 origin = new Vector2(Texture.Width/2,Texture.Height/2);
             spriteBatch.Draw(Texture,location,sourceRectangle,Color.White,ship_angle,origin,1.0f,SpriteEffects.None,1);
             fuelEngine.Draw(spriteBatch);
