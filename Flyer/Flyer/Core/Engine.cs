@@ -117,7 +117,7 @@ namespace Flyer
             bulletTexture = Content.Load<Texture2D>("images/bullet");
             plasmaTexture = Content.Load<Texture2D>("images/plasma");
             laserTexture = Content.Load<Texture2D>("images/laser");
-
+            newShip.ProjectileTexture = bulletTexture;
             explosionTexture = Content.Load<Texture2D>("images/explosion");
 
             //BONUS DATA
@@ -131,9 +131,10 @@ namespace Flyer
             //ENEMY DATA
             droneTexture = Content.Load<Texture2D>("images/drone");
             //EnemyFactory.Build(droneTexture, newDrones, newShip.location);
-            newShip.ProjectileTexture = bulletTexture;
+            Texture2D projectileTexture = Content.Load<Texture2D>("images/blackBall");
             var mineTexture = Content.Load<Texture2D>("images/mine");
-            EnemyFactory.Build(mineTexture, newMines, newShip.location);
+            EnemyFactory.Build(mineTexture, newMines, newShip.location,projectileTexture);
+
         }
 
         /// <summary>
@@ -171,7 +172,7 @@ namespace Flyer
             //DRONE FACTORY
             for (int i = 0; i < newMines.Count; i++)
             {
-                newMines[i].Update();
+                newMines[i].Update(newShip.location);
             }
             
             //END

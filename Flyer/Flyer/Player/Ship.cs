@@ -177,15 +177,15 @@ namespace Flyer
                     {
                         case "bullet":
                             shipProjectiles.Add(new Bullet(ProjectileTexture, this.location, 
-                                this.directionWhenShot,this.ship_angle));
+                                this.directionWhenShot));
                             break;
                         case "laser":
                             shipProjectiles.Add(new Laser(ProjectileTexture, this.location,
-                                this.directionWhenShot, this.ship_angle));
+                                this.directionWhenShot));
                             break;
                         case "plasma":
                             shipProjectiles.Add(new PlasmaProjectile(ProjectileTexture, this.location,
-                                this.directionWhenShot, this.ship_angle));
+                                this.directionWhenShot));
                             break;
                     }
                 }

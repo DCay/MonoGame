@@ -14,15 +14,15 @@ namespace Flyer.Interfaces
 
         Direction Direction { get; }
 
-        Vector2 Location { get;}
+        Vector2 Location { get; set; }
 
         bool ToDraw { get; set; }
 
-        //int Damage { get; set; }
+        int Damage { get; set; }
 
-        //int Speed { get; set; }
+        int Speed { get; set; }
 
-        //void SetPosition(Direction direction, Vector2 location);
+        void SetPosition(Vector2 location);
 
         void Update();
 

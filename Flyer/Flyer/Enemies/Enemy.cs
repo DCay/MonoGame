@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Flyer.Enums;
+using Flyer.Projectiles;
+using Flyer.Projectiles.EnemyProjectiles;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -9,11 +12,14 @@ namespace Flyer.Enemies
 {
     public abstract class Enemy
     {
+        public Texture2D ProjectileTexture { get; set; }
+        private int projectileIndex = 0;
         private int hitPoints;
         private double speed;
         static Random rand = new Random();
         protected Vector2 location = new Vector2(rand.Next(0, 5000), rand.Next(0, 5000));
-       
+        protected List<EnemyProjectile> projectiles;
+        private int reload=0;
         //private int initalX = rand.Next(0, 200);
 
         protected Enemy(double speed, int hitPoints, Texture2D texture)
@@ -23,6 +29,7 @@ namespace Flyer.Enemies
             this.Texture = texture;
             this.EnemyAngle = (float)(rand.NextDouble() * 2 * Math.PI);
             this.Location = location;
+            this.projectiles = new List<EnemyProjectile>();
         }
 
         public Enemy()
@@ -50,8 +57,8 @@ namespace Flyer.Enemies
         }
         public float EnemyAngle { get; set; }
 
-        public virtual void Update()
-        {
+        public virtual void Update(Vector2 target)
+        {   
             this.location.X -= (float)(this.Speed * Math.Cos(this.EnemyAngle));
             this.location.Y -= (float)(this.Speed * Math.Sin(this.EnemyAngle));
             if (this.location.X < -1 || this.location.X > 5001)
@@ -62,9 +69,45 @@ namespace Flyer.Enemies
             {
                 this.EnemyAngle--;
             }
+
+            if (IsInRange(target))
+            {
+                reload++;
+                if (reload >= 90)
+                {
+                    this.projectiles.Add(new BlackBall(ProjectileTexture, this.location, 0));
+                    this.projectiles[projectileIndex].SetPosition(target);
+                    this.projectiles[projectileIndex].isAlive = true;
+                    projectileIndex++;
+                    reload = 0;
+                }
+            }
+            for (int i = 0; i < projectileIndex; i++)
+            {
+
+                this.projectiles[i].Update();
+                if(this.projectiles[i].isAlive==false)
+                {
+                    this.projectiles.Remove(this.projectiles[i]);
+                    projectileIndex--;
+                }
+            }
         }
 
         public abstract void Draw(SpriteBatch spriteBatch);
+
+        public bool IsInRange(Vector2 location)
+        {
+            if (Math.Sqrt((this.Location.X - location.X) * (this.Location.X - location.X) +
+                    (this.Location.Y - location.Y) * (this.Location.Y - location.Y)) < 500)
+            {
+                return true;   
+            }
+            else
+            {
+                return false;
+            }
+        }
 
     }
 }

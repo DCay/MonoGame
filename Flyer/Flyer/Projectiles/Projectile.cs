@@ -10,11 +10,11 @@ namespace Flyer.Interfaces
 {
     public abstract class Projectile : IProjectile
     {
-        private Vector2 location;
+        protected Vector2 location;
         private float angle;
         protected int speed;
 
-        protected Projectile(Texture2D texture, Vector2 location, Direction direction, float angle)
+        protected Projectile(Texture2D texture, Vector2 location, Direction direction)
         {
             this.Texture = texture;
             this.location = location;
@@ -29,12 +29,13 @@ namespace Flyer.Interfaces
         public Vector2 Location
         { 
             get { return this.location; }
+            set { this.location = value; }
         }
 
         public float Angle
         {
             get { return this.angle; }
-            private set { this.angle = value; }
+            set { this.angle = value; }
         }
 
         public virtual void Update()
@@ -43,32 +44,40 @@ namespace Flyer.Interfaces
             {
                 case Direction.Up:
                     this.location.Y -= this.speed;
+                    this.Angle = 0;
                     break;
                 case Direction.Down:
                     this.location.Y += this.speed;
+                    this.Angle = (float)Math.PI;
                     break;
                 case Direction.Right:
                     this.location.X += this.speed;
+                    this.Angle = (float)Math.PI / 2;
                     break;
                 case Direction.Left:
                     this.location.X -= this.speed;
+                    this.Angle = 3*(float)Math.PI / 2;
                     break;
                 //DIAGONALS
                 case Direction.UpLeft:
                     this.location.Y -= this.speed / 2;
                     this.location.X -= this.speed / 2;
+                    this.Angle = 7 * (float)Math.PI / 4;
                     break;
                 case Direction.UpRight:
                     this.location.Y -= this.speed / 2;
                     this.location.X += this.speed / 2;
+                    this.Angle = (float)Math.PI / 4;
                     break;
                 case Direction.DownLeft:
                     this.location.Y += this.speed / 2;
                     this.location.X -= this.speed / 2;
+                    this.Angle = 5 * (float)Math.PI / 4;
                     break;
                 case Direction.DownRight:
                     this.location.Y += this.speed / 2;
                     this.location.X += this.speed / 2;
+                    this.Angle = 3 * (float)Math.PI / 4;
                     break;
             }
             if (this.Location.X < 0 || this.Location.X > 5000 || this.Location.Y < 0 || this.Location.Y > 5000)
@@ -85,6 +94,36 @@ namespace Flyer.Interfaces
                 Vector2 origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
                 spriteBatch.Draw(this.Texture, this.Location, sourceRectangle, Color.White, this.Angle, origin, 1.0f, SpriteEffects.None, 1);
             }
+        }
+
+
+        public int Damage
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int Speed
+        {
+            get
+            {
+                return this.speed;
+            }
+            set
+            {
+                //throw new NotImplementedException();
+            }
+        }
+
+        public virtual void SetPosition(Vector2 location)
+        {
+
         }
     }
 }
