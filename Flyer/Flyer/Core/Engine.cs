@@ -47,6 +47,7 @@ namespace Flyer
         private Texture2D droneTexture;
         private List<Dron> newDrones;
         private int droneIndex=200;
+        private List<Enemy> newMines;
 
         //BONUS DATA
         private Texture2D upgradeTexture;
@@ -85,6 +86,7 @@ namespace Flyer
             camera.cameraY = 2500;
             camera.cameraX = 2500;
             newDrones = new List<Dron>();
+            newMines = new List<Enemy>();
             upgrades=new List<WeaponUpgrade>();
             base.Initialize();
         }
@@ -128,8 +130,10 @@ namespace Flyer
             
             //ENEMY DATA
             droneTexture = Content.Load<Texture2D>("images/drone");
-            EnemyFactory.Build(droneTexture, newDrones, newShip.location);
+            //EnemyFactory.Build(droneTexture, newDrones, newShip.location);
             newShip.ProjectileTexture = bulletTexture;
+            var mineTexture = Content.Load<Texture2D>("images/mine");
+            EnemyFactory.Build(mineTexture, newMines, newShip.location);
         }
 
         /// <summary>
@@ -165,9 +169,9 @@ namespace Flyer
             //END
 
             //DRONE FACTORY
-            for (int i = 0; i < newDrones.Count; i++)
+            for (int i = 0; i < newMines.Count; i++)
             {
-                newDrones[i].Update();
+                newMines[i].Update();
             }
             
             //END
@@ -186,14 +190,24 @@ namespace Flyer
             spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
             newShip.Draw(spriteBatch);
             ExplosionDraw(spriteBatch);
+            
+            //LIST DRAWING
+            //UPGRADES
             for (int i = 0; i < upgrades.Count; i++)
             {
                 upgrades[i].Draw(spriteBatch);
             }
+            //MINES
+            for (int i = 0; i < newMines.Count; i++)
+            {
+                newMines[i].Draw(spriteBatch);
+            }
+            //DRONES
             for (int i = 0; i < newDrones.Count; i++)
             {
                 newDrones[i].Draw(spriteBatch);   
             }
+            
             spriteBatch.End();
             spriteBatch.Begin();
             spriteBatch.DrawString(score_font,"Score : " + playerScore,new Vector2(graphics.PreferredBackBufferWidth-150,20),Color.White);
@@ -211,7 +225,7 @@ namespace Flyer
         public void CheckBattleStats()
         {
             //SHOT
-            int index = BattleManager.CheckHitStatus(newShip.shipProjectiles, newDrones);
+            int index = BattleManager.CheckHitStatus(newShip.shipProjectiles, newMines);
             Random chanceToDrop = new Random();
             if (index != -1)
             {
@@ -220,15 +234,15 @@ namespace Flyer
                 //EXPLOSION
                 explosionDraw = true;
                 explosionTimer = 0;
-                explosionLocation = new Vector2((newDrones[index].Location.X - newDrones[index].Texture.Width)
-                    , (newDrones[index].Location.Y - newDrones[index].Texture.Height));
+                explosionLocation = new Vector2((newMines[index].Location.X - newMines[index].Texture.Width)
+                    , (newMines[index].Location.Y - newMines[index].Texture.Height));
                 
                 //LOOT
                 int isDroped = chanceToDrop.Next(20);
                 switch (isDroped)
                 {
                     case 1:
-                        upgrades.Add(new WeaponUpgrade(upgradeTexture,newDrones[index].Location));
+                        upgrades.Add(new WeaponUpgrade(upgradeTexture,newMines[index].Location));
                         break;
                     case 8:
                         break;
@@ -237,20 +251,20 @@ namespace Flyer
                 }
 
                 //END LOOT
-                
-                newDrones.Remove(newDrones[index]);
+
+                newMines.Remove(newMines[index]);
                 index = -1;
             }
             //COLLISION
-            int index2 = BattleManager.CheckCollisionStatus(newShip, newDrones);
+            int index2 = BattleManager.CheckCollisionStatus(newShip, newMines);
             if(index2!=-1)
             {
                 playerScore += 10;
                 explosionDraw = true;
                 explosionTimer = 0;
-                explosionLocation = new Vector2((newDrones[index2].Location.X - newDrones[index2].Texture.Width)
-                    , (newDrones[index2].Location.Y - newDrones[index2].Texture.Height));
-                newDrones.Remove(newDrones[index2]);
+                explosionLocation = new Vector2((newMines[index2].Location.X - newMines[index2].Texture.Width)
+                    , (newMines[index2].Location.Y - newMines[index2].Texture.Height));
+                newMines.Remove(newMines[index2]);
                 newShip.PlayerHP -= 20;
                 index2 = -1;
             }

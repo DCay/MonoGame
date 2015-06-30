@@ -10,13 +10,13 @@ namespace Flyer.Enemies
     public abstract class Enemy
     {
         private int hitPoints;
-        private int speed;
+        private double speed;
         static Random rand = new Random();
         protected Vector2 location = new Vector2(rand.Next(0, 5000), rand.Next(0, 5000));
        
         //private int initalX = rand.Next(0, 200);
 
-        protected Enemy(int speed, int hitPoints, Texture2D texture)
+        protected Enemy(double speed, int hitPoints, Texture2D texture)
         {
             this.Speed = speed;
             this.HitPoints = hitPoints;
@@ -30,7 +30,7 @@ namespace Flyer.Enemies
             // TODO: Complete member initialization
         }
 
-        public int Speed { get; set; }
+        public double Speed { get; set; }
         public int HitPoints { get; set; }
         public Texture2D Texture { get; set; }
         public Vector2 Location
@@ -50,7 +50,19 @@ namespace Flyer.Enemies
         }
         public float EnemyAngle { get; set; }
 
-        public abstract void Update();
+        public virtual void Update()
+        {
+            this.location.X -= (float)(this.Speed * Math.Cos(this.EnemyAngle));
+            this.location.Y -= (float)(this.Speed * Math.Sin(this.EnemyAngle));
+            if (this.location.X < -1 || this.location.X > 5001)
+            {
+                this.EnemyAngle--;
+            }
+            if (this.location.Y < -1 || this.location.Y > 5001)
+            {
+                this.EnemyAngle--;
+            }
+        }
 
         public abstract void Draw(SpriteBatch spriteBatch);
 

@@ -44,6 +44,8 @@
     <Compile Include="Core\Outsiders.cs" />
     <Compile Include="Enemies\Dron.cs" />
     <Compile Include="Enemies\Enemy.cs" />
+    <Compile Include="Enemies\Invader.cs" />
+    <Compile Include="Enemies\Mine.cs" />
     <Compile Include="Enums\Direction.cs" />
     <Compile Include="Enemies\EnemyFactory.cs" />
     <Compile Include="Interfaces\IProjectile.cs" />

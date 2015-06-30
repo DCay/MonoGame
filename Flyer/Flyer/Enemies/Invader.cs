@@ -7,14 +7,12 @@ using System.Text;
 
 namespace Flyer.Enemies
 {
-    public class Dron : Enemy
+    public class Invader : Enemy
     {
-        //Texture2D dronTexture;
-
         public readonly Rectangle source;
 
-        public Dron(Texture2D texture)
-            : base(3, 1, texture)
+        public Invader(Texture2D texture)
+            : base(2, 2, texture)
         {
             this.source = new Rectangle(0, 0, this.Texture.Width, this.Texture.Height);
         }

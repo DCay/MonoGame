@@ -10,11 +10,11 @@ namespace Flyer.Factories
 {
     public static class EnemyFactory
     {
-        public static List<Dron> Build(Texture2D texture, List<Dron> list, Vector2 location)
+        public static List<Enemy> Build(Texture2D texture, List<Enemy> list, Vector2 location)
         {
             for (int i = 0; i < 200; i++)
             {
-                Dron nextDron = new Dron(texture);
+                var nextDron = new Mine(texture);
 
                 if (Math.Sqrt((nextDron.Location.X - location.X) * (nextDron.Location.X - location.X) +
                     (nextDron.Location.Y - location.Y) * (nextDron.Location.Y - location.Y)) > 1400)
