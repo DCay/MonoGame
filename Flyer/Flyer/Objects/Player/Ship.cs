@@ -22,6 +22,7 @@ namespace Flyer
         public int PlayerHP { get; set; }
         public int PlayerShields { get; set; }
         private FuelEngine fuelEngine;
+        public int playerScore = 0;
 
         //PROJECTILE DATA
         public List<IProjectile> shipProjectiles= new List<IProjectile>();

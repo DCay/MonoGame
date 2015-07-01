@@ -20,7 +20,6 @@ namespace Flyer.Enemies
         public Vector2 location = new Vector2(rand.Next(0, 5000), rand.Next(0, 5000));
         public List<EnemyProjectile> projectiles;
         private int reload=0;
-        //private int initalX = rand.Next(0, 200);
 
         protected Enemy(double speed, int hitPoints, Texture2D texture)
         {
@@ -76,7 +75,7 @@ namespace Flyer.Enemies
                 reload++;
                 if (reload >= 90)
                 {
-                    this.projectiles.Add(new BlackBall(ProjectileTexture, this.location, 0));
+                    this.projectiles.Add(new RedBall(ProjectileTexture, this.location, 0));
                     this.projectiles[projectileIndex].SetPosition(target);
                     this.projectiles[projectileIndex].isAlive = true;
                     projectileIndex++;

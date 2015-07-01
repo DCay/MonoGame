@@ -11,10 +11,11 @@ namespace Flyer.Enemies
     {
         public readonly Rectangle source;
 
-        public Invader(Texture2D texture)
+        public Invader(Texture2D texture, Texture2D projectileTexture)
             : base(2, 2, texture)
         {
             this.source = new Rectangle(0, 0, this.Texture.Width, this.Texture.Height);
+            this.ProjectileTexture = projectileTexture;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

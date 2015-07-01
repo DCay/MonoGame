@@ -7,6 +7,7 @@ using Flyer.Enemies;
 using Flyer.Enums;
 using Flyer.Factories;
 using Flyer.Interfaces;
+using Flyer.Objects;
 using Flyer.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,7 +29,6 @@ namespace Flyer
 
         //PLAYER DATA
         private Ship newShip;
-        private int playerScore=0;
         private SpriteFont score_font;    
         private SpriteFont coordinate_font;
         private Texture2D playerHPbar;
@@ -45,20 +45,22 @@ namespace Flyer
         /// EENEMY DATA
         /// </summary>
         private Texture2D droneTexture;
-        private List<Dron> newDrones;
+        private Texture2D invaderTexture;
+        private List<Enemy> newDrones;
+        private List<Enemy> newInvaders; 
         private int droneIndex=200;
         private List<Enemy> newMines;
+        private Texture2D redBallTexture;
 
         //BONUS DATA
         private Texture2D upgradeTexture;
-        private List<WeaponUpgrade> upgrades; 
+        private List<WeaponUpgrade> newUpgrades; 
 
         //JUNK DATA
         private int universalReload = 0;
+        private List<Explosion> newExplosions; 
         private Texture2D explosionTexture;
-        private bool explosionDraw = false;
-        private Vector2 explosionLocation;
-        private int explosionTimer = 0;
+        private int explosionIndex;
         private Texture2D redbar;
         private Texture2D bluebar;
         private double redBarIndex=195;
@@ -85,9 +87,11 @@ namespace Flyer
             currentState = Keyboard.GetState();
             camera.cameraY = 2500;
             camera.cameraX = 2500;
-            newDrones = new List<Dron>();
             newMines = new List<Enemy>();
-            upgrades=new List<WeaponUpgrade>();
+            newDrones = new List<Enemy>();
+            newInvaders = new List<Enemy>();
+            newUpgrades=new List<WeaponUpgrade>();
+            newExplosions = new List<Explosion>();
             base.Initialize();
         }
 
@@ -130,11 +134,12 @@ namespace Flyer
             
             //ENEMY DATA
             droneTexture = Content.Load<Texture2D>("images/drone");
+            invaderTexture = Content.Load<Texture2D>("images/invader");
             //EnemyFactory.Build(droneTexture, newDrones, newShip.location);
-            Texture2D projectileTexture = Content.Load<Texture2D>("images/blackBall");
+            redBallTexture = Content.Load<Texture2D>("images/redBall");
             var mineTexture = Content.Load<Texture2D>("images/mine");
-            EnemyFactory.Build(mineTexture, newMines, newShip.location,projectileTexture);
-
+            EnemyFactory.Build(mineTexture, newMines, newShip.location);
+            BattleManager.Initialise(explosionTexture,upgradeTexture);
         }
 
         /// <summary>
@@ -153,9 +158,11 @@ namespace Flyer
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            EnemyFactory.gameTime = gameTime;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             KeyboardState state = Keyboard.GetState();
+
             CameraCheck();
             newShip.Update(state);
             //CAMERA MOVEMENT
@@ -170,12 +177,26 @@ namespace Flyer
             //END
 
             //DRONE FACTORY
+            EnemyFactory.ProcedureBuild(droneTexture, newDrones, newShip.location, redBallTexture, gameTime);
+            
+            //END
+            
+            //ENEMY UPDATE
             for (int i = 0; i < newMines.Count; i++)
             {
                 newMines[i].Update(newShip.location);
             }
-            
+            for (int i = 0; i < newDrones.Count; i++)
+            {
+                newDrones[i].Update(newShip.location);
+            }
             //END
+            for (int i = 0; i < newExplosions.Count; i++)
+            {
+                newExplosions[i].Update();
+            }
+            redBarIndex = (195 * newShip.PlayerHP) / 100;
+            blueBarIndex = (190 * newShip.PlayerShields) / 200;
             Outsiders.Update(state);
             base.Update(gameTime);
         }
@@ -190,13 +211,12 @@ namespace Flyer
             spriteBatch.Begin(SpriteSortMode.Deferred,BlendState.AlphaBlend,null,null,null,null,camera.Transform);
             spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
             newShip.Draw(spriteBatch);
-            ExplosionDraw(spriteBatch);
             
             //LIST DRAWING
             //UPGRADES
-            for (int i = 0; i < upgrades.Count; i++)
+            for (int i = 0; i < newUpgrades.Count; i++)
             {
-                upgrades[i].Draw(spriteBatch);
+                newUpgrades[i].Draw(spriteBatch);
             }
             //MINES
             for (int i = 0; i < newMines.Count; i++)
@@ -208,10 +228,14 @@ namespace Flyer
             {
                 newDrones[i].Draw(spriteBatch);   
             }
-            
+            //EXPLOSIONS
+            for (int i = 0; i < newExplosions.Count; i++)
+            {
+                newExplosions[i].Draw(spriteBatch);
+            }
             spriteBatch.End();
             spriteBatch.Begin();
-            spriteBatch.DrawString(score_font,"Score : " + playerScore,new Vector2(graphics.PreferredBackBufferWidth-150,20),Color.White);
+            spriteBatch.DrawString(score_font,"Score : " + newShip.playerScore,new Vector2(graphics.PreferredBackBufferWidth-150,20),Color.White);
             //THE BULLSHIT METHOD !!!
             Outsiders.Draw(spriteBatch,universalFont,newShip.location,playerHPbar,redbar,bluebar,redBarIndex,blueBarIndex);
             //END OF BULLSHIT !!!
@@ -225,68 +249,12 @@ namespace Flyer
         //BATTLE STATUS
         public void CheckBattleStats()
         {
-            //SHOT
-            int index = BattleManager.CheckHitStatus(newShip.shipProjectiles, newMines);
-            Random chanceToDrop = new Random();
-            if (index != -1)
+            BattleManager.CheckHitStatus(newShip, newDrones, newExplosions, newUpgrades);
+            BattleManager.CheckCollisionStatus(newShip,newMines,newExplosions);
+            for (int i = 0; i < newDrones.Count; i++)
             {
-                playerScore += 10;
-                
-                //EXPLOSION
-                explosionDraw = true;
-                explosionTimer = 0;
-                explosionLocation = new Vector2((newMines[index].Location.X - newMines[index].Texture.Width)
-                    , (newMines[index].Location.Y - newMines[index].Texture.Height));
-                
-                //LOOT
-                int isDroped = chanceToDrop.Next(20);
-                switch (isDroped)
-                {
-                    case 1:
-                        upgrades.Add(new WeaponUpgrade(upgradeTexture,newMines[index].Location));
-                        break;
-                    case 8:
-                        break;
-                    default:
-                        break;
-                }
-
-                //END LOOT
-
-                newMines.Remove(newMines[index]);
-                index = -1;
+                BattleManager.CheckIfShipHit(newDrones[i].projectiles, newShip);
             }
-            //COLLISION
-            int index2 = BattleManager.CheckCollisionStatus(newShip, newMines);
-            if(index2!=-1)
-            {
-                playerScore += 10;
-                explosionDraw = true;
-                explosionTimer = 0;
-                explosionLocation = new Vector2((newMines[index2].Location.X - newMines[index2].Texture.Width)
-                    , (newMines[index2].Location.Y - newMines[index2].Texture.Height));
-                newMines.Remove(newMines[index2]);
-                newShip.PlayerHP -= 20;
-                index2 = -1;
-            }
-            redBarIndex = (195 * newShip.PlayerHP) / 100;
-            blueBarIndex = (190 * newShip.PlayerShields) / 200;
-            for (int i = 0; i < newMines.Count; i++)
-            {
-                BattleManager.CheckIfShipHit(newMines[i].projectiles,newShip);   
-            }
-        }
-        //EXPLOSIONS
-        public void ExplosionDraw(SpriteBatch spriteBatch)
-        {
-
-            if (explosionDraw && explosionTimer < 10)
-            {
-                explosionTimer++;
-                spriteBatch.Draw(explosionTexture, explosionLocation
-                    , new Rectangle(0, 0, explosionTexture.Width, explosionTexture.Height), Color.White);
-            }
-            else explosionDraw = false;
         }
         //CAMERA CHECK
         public void CameraCheck()
@@ -315,16 +283,16 @@ namespace Flyer
         //UPGRADE CHECK
         public void UpgradeCheck()
         {
-            for (int i = 0; i < upgrades.Count; i++)
+            for (int i = 0; i < newUpgrades.Count; i++)
             {
-                if ((newShip.location.X >= upgrades[i].Location.X - upgrades[i].Texture.Width / 2)
-                    && (newShip.location.X <= upgrades[i].Location.X + upgrades[i].Texture.Width / 2)
-                    && (newShip.location.Y >= upgrades[i].Location.Y - upgrades[i].Texture.Height / 2)
-                    && (newShip.location.Y <= upgrades[i].Location.Y + upgrades[i].Texture.Height / 2)
+                if ((newShip.location.X >= newUpgrades[i].Location.X - newUpgrades[i].Texture.Width / 2)
+                    && (newShip.location.X <= newUpgrades[i].Location.X + newUpgrades[i].Texture.Width / 2)
+                    && (newShip.location.Y >= newUpgrades[i].Location.Y - newUpgrades[i].Texture.Height / 2)
+                    && (newShip.location.Y <= newUpgrades[i].Location.Y + newUpgrades[i].Texture.Height / 2)
                     )
                 {
-                    newShip.ProjectileType = upgrades[i].Upgrade(newShip.ProjectileType);
-                    upgrades.Remove(upgrades[i]);
+                    newShip.ProjectileType = newUpgrades[i].Upgrade(newShip.ProjectileType);
+                    newUpgrades.Remove(newUpgrades[i]);
                 }
                 if (newShip.ProjectileType == "laser") newShip.ProjectileTexture = laserTexture;
                 if (newShip.ProjectileType == "plasma") newShip.ProjectileTexture = plasmaTexture;
