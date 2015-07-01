@@ -15,7 +15,7 @@ namespace Flyer.Projectiles
         public BlackBall(Texture2D texture, Vector2 location, Direction direction)
             : base(texture, location, direction)
         {
-            this.speed = 5;
+            this.speed = 30;
         }
     }
 }

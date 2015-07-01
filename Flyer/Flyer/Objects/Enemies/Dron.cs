@@ -19,6 +19,9 @@ namespace Flyer.Enemies
         {
             this.source = new Rectangle(0, 0, this.Texture.Width, this.Texture.Height);
             this.ProjectileTexture = projectileTexture;
+            this.HitPoints = 2;
+            this.Damage = 10;
+            this.reload = 100;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

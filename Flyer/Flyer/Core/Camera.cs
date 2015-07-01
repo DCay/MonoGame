@@ -13,6 +13,8 @@ namespace Flyer
         /// <summary>
         /// PROPERTIES & FIELDS
         /// </summary>
+        public Vector2 shipLocation { get; set; }
+        
         public Viewport Viewpoint { get; private set; }
 
         public Vector2 Position { get; set; }
@@ -67,8 +69,9 @@ namespace Flyer
         /// <summary>
         /// Update Method
         /// </summary>
-        public void Update(GameTime gametime, KeyboardState current, KeyboardState previous)
+        public void Update(GameTime gametime, KeyboardState current, KeyboardState previous,Vector2 location)
         {
+            shipLocation = location;
             if (shakeTimer.TotalSeconds > 0)
             {
                 this.Position = SavedPosition;
@@ -80,6 +83,8 @@ namespace Flyer
                         (float) ((random.NextDouble()*2) - 1)*PositionShakeAmount);
                     this.Rotation += (float) ((random.NextDouble()*2) - 1)*RotationShakeAmount;
                 }
+                this.cameraY = shipLocation.Y;
+                this.cameraX = shipLocation.X;
             }
             else
             {
@@ -152,7 +157,7 @@ namespace Flyer
                 PositionShakeAmount = positionAmount;
                 RotationShakeAmount = rotationAmount;
 
-                SavedPosition = Position;
+                SavedPosition = shipLocation;
                 SavedRotation = Rotation;
             }
         }

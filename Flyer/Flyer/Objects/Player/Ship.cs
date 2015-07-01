@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Flyer
 {
-    class Ship
+    class Ship : IAttack
     {
         public Texture2D Texture { get; set; }
         public Vector2 location = new Vector2(2500,2500);
@@ -25,12 +25,9 @@ namespace Flyer
         public int playerScore = 0;
 
         //PROJECTILE DATA
-        public List<IProjectile> shipProjectiles= new List<IProjectile>();
+        public List<IProjectile> projectiles= new List<IProjectile>();
         public Texture2D ProjectileTexture;
         public string ProjectileType="bullet";
-
-        //JUNK DATA
-        private int detailsReload = 0;
 
         public Vector2 Origin
         {
@@ -44,10 +41,12 @@ namespace Flyer
         {
             this.Texture = texture;
             this.location = location;
-            ship_angle = shipAngle;
+            this.ship_angle = shipAngle;
             this.PlayerHP = 100;
             this.PlayerShields = 200;
-            fuelEngine = new FuelEngine(fuelEngineTexture,new Vector2(2500, 2500),Color.OrangeRed);
+            this.fuelEngine = new FuelEngine(fuelEngineTexture,new Vector2(2500, 2500),Color.OrangeRed);
+            this.reload = 15;
+            this.reloadCounter = 0;
         }
 
         public void Update(KeyboardState state)
@@ -168,8 +167,9 @@ namespace Flyer
             fuelEngine.Destroy();
 
             //CHAR SHOTTING
-            detailsReload++;
-            if (detailsReload >= 15)
+            reloadCounter++;
+            
+            if (reloadCounter >= reload)
             {
                 if (state.IsKeyDown(Keys.Space))
                 {
@@ -177,27 +177,33 @@ namespace Flyer
                     switch (this.ProjectileType)
                     {
                         case "bullet":
-                            shipProjectiles.Add(new Bullet(ProjectileTexture, this.location, 
+                            projectiles.Add(new Bullet(ProjectileTexture, this.location, 
                                 this.directionWhenShot));
+                            this.Damage = 1;
+                            this.reload = 15;
                             break;
                         case "laser":
-                            shipProjectiles.Add(new Laser(ProjectileTexture, this.location,
+                            projectiles.Add(new Laser(ProjectileTexture, this.location,
                                 this.directionWhenShot));
+                            this.Damage = 3;
+                            this.reload = 5;
                             break;
                         case "plasma":
-                            shipProjectiles.Add(new PlasmaProjectile(ProjectileTexture, this.location,
+                            projectiles.Add(new PlasmaProjectile(ProjectileTexture, this.location,
                                 this.directionWhenShot));
+                            this.Damage = 5;
+                            this.reload = 10;
                             break;
                     }
+                    reloadCounter = 0;
                 }
-                detailsReload = 0;
             }
-            for (int i = 0; i < shipProjectiles.Count; i++)
+            for (int i = 0; i < projectiles.Count; i++)
             {
-                shipProjectiles[i].Update();
-                if (shipProjectiles[i].ToDraw == false)
+                projectiles[i].Update();
+                if (projectiles[i].ToDraw == false)
                 {
-                    shipProjectiles.Remove(shipProjectiles[i]);
+                    projectiles.Remove(projectiles[i]);
                 }
             }
             //END CHAR SHOTTING
@@ -211,10 +217,14 @@ namespace Flyer
             Vector2 origin = new Vector2(Texture.Width/2,Texture.Height/2);
             spriteBatch.Draw(Texture,location,sourceRectangle,Color.White,ship_angle,origin,1.0f,SpriteEffects.None,1);
             fuelEngine.Draw(spriteBatch);
-            for (int i = 0; i < shipProjectiles.Count; i++)
+            for (int i = 0; i < projectiles.Count; i++)
             {
-                shipProjectiles[i].Draw(spriteBatch);
+                projectiles[i].Draw(spriteBatch);
             }
         }
+
+        public int Damage { get; set; }
+        public int reload { get; set; }
+        public int reloadCounter { get; set; }
     }
 }

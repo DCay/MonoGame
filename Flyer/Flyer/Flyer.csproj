@@ -38,6 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IAttack.cs" />
+    <Compile Include="Interfaces\IDestroyable.cs" />
     <Compile Include="Objects\Bonuses\WeaponUpgrade.cs" />
     <Compile Include="Core\BattleManager.cs" />
     <Compile Include="Core\Camera.cs" />

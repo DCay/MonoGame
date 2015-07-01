@@ -96,19 +96,6 @@ namespace Flyer.Interfaces
             }
         }
 
-
-        public int Damage
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public int Speed
         {
             get
@@ -117,7 +104,7 @@ namespace Flyer.Interfaces
             }
             set
             {
-                //throw new NotImplementedException();
+                this.speed = value;
             }
         }
 

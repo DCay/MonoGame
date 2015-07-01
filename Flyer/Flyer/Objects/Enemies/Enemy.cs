@@ -7,19 +7,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Flyer.Interfaces;
 
 namespace Flyer.Enemies
 {
-    public abstract class Enemy
+    public abstract class Enemy : IDestroyable,IAttack
     {
         public Texture2D ProjectileTexture { get; set; }
         private int projectileIndex = 0;
-        private int hitPoints;
         private double speed;
         static Random rand = new Random();
         public Vector2 location = new Vector2(rand.Next(0, 5000), rand.Next(0, 5000));
         public List<EnemyProjectile> projectiles;
-        private int reload=0;
 
         protected Enemy(double speed, int hitPoints, Texture2D texture)
         {
@@ -29,6 +28,8 @@ namespace Flyer.Enemies
             this.EnemyAngle = (float)(rand.NextDouble() * 2 * Math.PI);
             this.Location = location;
             this.projectiles = new List<EnemyProjectile>();
+            this.isDead = false;
+            this.reloadCounter = 0;
         }
 
         public Enemy()
@@ -37,7 +38,6 @@ namespace Flyer.Enemies
         }
 
         public double Speed { get; set; }
-        public int HitPoints { get; set; }
         public Texture2D Texture { get; set; }
         public Vector2 Location
         {
@@ -58,37 +58,40 @@ namespace Flyer.Enemies
 
         public virtual void Update(Vector2 target)
         {
-            projectileIndex = projectiles.Count;
-            this.location.X -= (float)(this.Speed * Math.Cos(this.EnemyAngle));
-            this.location.Y -= (float)(this.Speed * Math.Sin(this.EnemyAngle));
-            if (this.location.X < -1 || this.location.X > 5001)
+            if (!this.isDead)
             {
-                this.EnemyAngle--;
-            }
-            if (this.location.Y < -1 || this.location.Y > 5001)
-            {
-                this.EnemyAngle--;
-            }
-
-            if (IsInRange(target))
-            {
-                reload++;
-                if (reload >= 90)
+                projectileIndex = projectiles.Count;
+                this.location.X -= (float) (this.Speed*Math.Cos(this.EnemyAngle));
+                this.location.Y -= (float) (this.Speed*Math.Sin(this.EnemyAngle));
+                if (this.location.X < -1 || this.location.X > 5001)
                 {
-                    this.projectiles.Add(new RedBall(ProjectileTexture, this.location, 0));
-                    this.projectiles[projectileIndex].SetPosition(target);
-                    this.projectiles[projectileIndex].isAlive = true;
-                    projectileIndex++;
-                    reload = 0;
+                    this.EnemyAngle--;
                 }
-            }
-            for (int i = 0; i < projectileIndex; i++)
-            {
-                this.projectiles[i].Update();
-                if(this.projectiles[i].isAlive==false)
+                if (this.location.Y < -1 || this.location.Y > 5001)
                 {
-                    this.projectiles.Remove(this.projectiles[i]);
-                    projectileIndex--;
+                    this.EnemyAngle--;
+                }
+
+                if (IsInRange(target))
+                {
+                    reloadCounter++;
+                    if (reloadCounter >= this.reload)
+                    {
+                        this.projectiles.Add(new RedBall(ProjectileTexture, this.location, 0));
+                        this.projectiles[projectileIndex].SetPosition(target);
+                        this.projectiles[projectileIndex].isAlive = true;
+                        projectileIndex++;
+                        reloadCounter = 0;
+                    }
+                }
+                for (int i = 0; i < projectileIndex; i++)
+                {
+                    this.projectiles[i].Update();
+                    if (this.projectiles[i].isAlive == false)
+                    {
+                        this.projectiles.Remove(this.projectiles[i]);
+                        projectileIndex--;
+                    }
                 }
             }
         }
@@ -108,5 +111,10 @@ namespace Flyer.Enemies
             }
         }
 
+        public int HitPoints { get; set; }
+        public bool isDead { get; set; }
+        public int Damage { get; set; }
+        public int reload { get; set; }
+        public int reloadCounter { get; set; }
     }
 }

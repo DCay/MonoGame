@@ -32,6 +32,7 @@ namespace Flyer
         private SpriteFont score_font;    
         private SpriteFont coordinate_font;
         private Texture2D playerHPbar;
+        private bool isOn=false;
         private Texture2D playerShieldbar;
         public Texture2D bulletTexture;
         public Texture2D laserTexture;
@@ -51,6 +52,7 @@ namespace Flyer
         private int droneIndex=200;
         private List<Enemy> newMines;
         private Texture2D redBallTexture;
+        private Texture2D blackBallTexture;
 
         //BONUS DATA
         private Texture2D upgradeTexture;
@@ -137,6 +139,7 @@ namespace Flyer
             invaderTexture = Content.Load<Texture2D>("images/invader");
             //EnemyFactory.Build(droneTexture, newDrones, newShip.location);
             redBallTexture = Content.Load<Texture2D>("images/redBall");
+            blackBallTexture = Content.Load<Texture2D>("images/blackBall");
             var mineTexture = Content.Load<Texture2D>("images/mine");
             EnemyFactory.Build(mineTexture, newMines, newShip.location);
             BattleManager.Initialise(explosionTexture,upgradeTexture);
@@ -158,17 +161,31 @@ namespace Flyer
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (isOn)
+            {
+                newShip.PlayerHP = 100;
+            }
             EnemyFactory.gameTime = gameTime;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             KeyboardState state = Keyboard.GetState();
-
+            if (state.IsKeyDown(Keys.B))
+            {
+                if (isOn==true)
+                {
+                    isOn = false;
+                }
+                else
+                {
+                    isOn = true;
+                }
+            }
             CameraCheck();
             newShip.Update(state);
             //CAMERA MOVEMENT
             previousState = currentState;
             currentState = Keyboard.GetState();
-            camera.Update(gameTime,currentState,previousState);
+            camera.Update(gameTime,currentState,previousState,newShip.location);
             //END CAMERA MOVEMENT
 
             //BATTLE STATUS CHECK
@@ -177,8 +194,15 @@ namespace Flyer
             //END
 
             //DRONE FACTORY
-            EnemyFactory.ProcedureBuild(droneTexture, newDrones, newShip.location, redBallTexture, gameTime);
-            
+            if (EnemyFactory.gameTime.TotalGameTime.TotalMinutes < 1)
+            {
+                EnemyFactory.ProcedureBuild(droneTexture, newDrones, newShip.location, redBallTexture, gameTime);
+            }
+            else
+            {
+                EnemyFactory.ProcedureBuild(invaderTexture, newInvaders, newShip.location, blackBallTexture, gameTime);
+            }
+
             //END
             
             //ENEMY UPDATE
@@ -186,9 +210,17 @@ namespace Flyer
             {
                 newMines[i].Update(newShip.location);
             }
+
             for (int i = 0; i < newDrones.Count; i++)
             {
                 newDrones[i].Update(newShip.location);
+            }
+            if (EnemyFactory.gameTime.TotalGameTime.TotalMinutes > 1)
+            {
+                for (int i = 0; i < newInvaders.Count; i++)
+                {
+                    newInvaders[i].Update(newShip.location);
+                }
             }
             //END
             for (int i = 0; i < newExplosions.Count; i++)
@@ -226,7 +258,14 @@ namespace Flyer
             //DRONES
             for (int i = 0; i < newDrones.Count; i++)
             {
-                newDrones[i].Draw(spriteBatch);   
+                newDrones[i].Draw(spriteBatch);
+            }
+            if (EnemyFactory.gameTime.TotalGameTime.TotalMinutes > 1)
+            {
+                for (int i = 0; i < newInvaders.Count; i++)
+                {
+                    newInvaders[i].Draw(spriteBatch);
+                }
             }
             //EXPLOSIONS
             for (int i = 0; i < newExplosions.Count; i++)
@@ -249,12 +288,21 @@ namespace Flyer
         //BATTLE STATUS
         public void CheckBattleStats()
         {
+            BattleManager.CheckHitStatus(newShip, newMines, newExplosions, newUpgrades);
             BattleManager.CheckHitStatus(newShip, newDrones, newExplosions, newUpgrades);
-            BattleManager.CheckCollisionStatus(newShip,newMines,newExplosions);
-            for (int i = 0; i < newDrones.Count; i++)
+            BattleManager.CheckHitStatus(newShip, newInvaders, newExplosions, newUpgrades);
+            if(BattleManager.CheckCollisionStatus(newShip,newMines,newExplosions) 
+                || BattleManager.CheckCollisionStatus(newShip, newDrones, newExplosions)
+                || BattleManager.CheckCollisionStatus(newShip, newInvaders, newExplosions))
             {
-                BattleManager.CheckIfShipHit(newDrones[i].projectiles, newShip);
+                camera.Shake(0.5f, 5f, 0.005f);
             }
+            BattleManager.CheckCollisionStatus(newShip,newMines,newExplosions);
+            BattleManager.CheckCollisionStatus(newShip, newDrones, newExplosions);
+            BattleManager.CheckCollisionStatus(newShip, newInvaders, newExplosions);
+            
+            BattleManager.CheckIfShipHit(newDrones, newShip);
+            BattleManager.CheckIfShipHit(newInvaders,newShip);
         }
         //CAMERA CHECK
         public void CameraCheck()

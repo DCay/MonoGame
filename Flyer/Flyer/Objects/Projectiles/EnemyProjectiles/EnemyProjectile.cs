@@ -21,8 +21,6 @@ namespace Flyer.Projectiles.EnemyProjectiles
 
         public override void SetPosition(Vector2 target)
         {
-            //this.Angle = (float)Math.Atan(Math.Abs((this.Location.Y - target.Y)) / Math.Abs((target.X - this.Location.X)));
-
             if (target.X > this.location.X && target.Y < this.location.Y)
             {
                 this.Angle = (float)Math.Atan((this.Location.Y - target.Y) / (target.X - this.Location.X));

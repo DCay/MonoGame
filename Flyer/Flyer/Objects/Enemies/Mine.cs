@@ -15,6 +15,8 @@ namespace Flyer.Enemies
             : base(0.05, 1, texture)
         {
             this.source = new Rectangle(0, 0, this.Texture.Width, this.Texture.Height);
+            this.HitPoints = 10;
+            this.Damage = 30;
         }
 
         public override void Update(Vector2 location)

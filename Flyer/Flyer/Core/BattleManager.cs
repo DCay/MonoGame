@@ -31,44 +31,51 @@ namespace Flyer.Core
         {
             for (int i = 0; i < enemies.Count; i++)
             {
-                for (int j = 0; j < player.shipProjectiles.Count; j++)
+                for (int j = 0; j < player.projectiles.Count; j++)
                 {
-                    if ((player.shipProjectiles[j].Location.X >= enemies[i].Location.X - enemies[i].Texture.Width/2)
-                        && (player.shipProjectiles[j].Location.X <= enemies[i].Location.X + enemies[i].Texture.Width/2)
-                        && (player.shipProjectiles[j].Location.Y >= enemies[i].Location.Y - enemies[i].Texture.Height/2)
-                        && (player.shipProjectiles[j].Location.Y <= enemies[i].Location.Y + enemies[i].Texture.Height/2)
+                    if ((player.projectiles[j].Location.X >= enemies[i].Location.X - enemies[i].Texture.Width/2)
+                        && (player.projectiles[j].Location.X <= enemies[i].Location.X + enemies[i].Texture.Width/2)
+                        && (player.projectiles[j].Location.Y >= enemies[i].Location.Y - enemies[i].Texture.Height/2)
+                        && (player.projectiles[j].Location.Y <= enemies[i].Location.Y + enemies[i].Texture.Height/2)
                         )
                     {
-                        player.shipProjectiles.Remove(player.shipProjectiles[j]);
+                        player.projectiles.Remove(player.projectiles[j]);
                         Random chanceToDrop = new Random();
-                        player.playerScore += 10;
-                        explosions.Add(new Explosion(ExplosionTexture,enemies[i].location));
-                        //EXPLOSION
-                        int explosionIndex = explosions.Count-1;
-                        explosions[explosionIndex].Location = new Vector2((enemies[i].Location.X - enemies[i].Texture.Width)
-                            , (enemies[i].Location.Y - enemies[i].Texture.Height));
-
-                        //LOOT
-                        int isDroped = chanceToDrop.Next(20);
-                        switch (isDroped)
+                        enemies[i].HitPoints -= player.Damage;
+                        if (enemies[i].HitPoints <= 0)
                         {
-                            case 1:
-                                upgrades.Add(new WeaponUpgrade(UpgradeTexture, enemies[i].Location));
-                                break;
-                            case 8:
-                                break;
-                            default:
-                                break;
+                            enemies[i].isDead = true;
+                            player.playerScore += 10;
+                            explosions.Add(new Explosion(ExplosionTexture, enemies[i].location));
+                            //EXPLOSION
+                            int explosionIndex = explosions.Count - 1;
+                            explosions[explosionIndex].Location =
+                                new Vector2((enemies[i].Location.X - enemies[i].Texture.Width)
+                                    , (enemies[i].Location.Y - enemies[i].Texture.Height));
+
+                            //LOOT
+                            int isDroped = chanceToDrop.Next(20);
+                            switch (isDroped)
+                            {
+                                case 1:
+                                    upgrades.Add(new WeaponUpgrade(UpgradeTexture, enemies[i].Location));
+                                    break;
+                                case 8:
+                                    break;
+                                default:
+                                    break;
+                            }
+                            //END LOOT
+                            enemies.Remove(enemies[i]);
+                            break;
                         }
-                        //END LOOT
-                        enemies.Remove(enemies[i]);
                     }
                 }
             }
             return;
         }
 
-        public static void CheckCollisionStatus(Ship player,List<Enemy> enemies,List<Explosion> explosions)
+        public static bool CheckCollisionStatus(Ship player,List<Enemy> enemies,List<Explosion> explosions)
         {
             for (int i = 0; i < enemies.Count; i++)
             {
@@ -87,37 +94,41 @@ namespace Flyer.Core
                     enemies.Remove(enemies[i]);
                     if (player.PlayerShields <= 0)
                     {
-                        player.PlayerHP -= 50;
+                        player.PlayerHP -= enemies[i].Damage+20;
                     }
                     else
                     {
-                        player.PlayerShields -= 50;
+                        player.PlayerShields -= enemies[i].Damage+20;
                     }
+                    return true;
                 }
             }
-            return;
+            return false;
         }
 
-        public static void CheckIfShipHit(List<EnemyProjectile> projectiles, Ship player)
+        public static void CheckIfShipHit(List<Enemy> enemies, Ship player)
         {
-            for (int i = 0; i < projectiles.Count; i++)
+            for (int i = 0; i < enemies.Count; i++)
             {
-                if (projectiles[i].Location.X >= player.sourceRectangle.Left - 20 + player.location.X
-                    && projectiles[i].Location.X <= player.sourceRectangle.Right/2 + player.location.X
-                    && projectiles[i].Location.Y >= player.sourceRectangle.Top - 20 + player.location.Y
-                    && projectiles[i].Location.Y <= player.sourceRectangle.Bottom/2 + player.location.Y)
+                for (int j = 0; j < enemies[i].projectiles.Count; j++)
                 {
-                    if (player.PlayerShields < 0)
+                    if (enemies[i].projectiles[j].Location.X >= player.sourceRectangle.Left - 20 + player.location.X
+                        && enemies[i].projectiles[j].Location.X <= player.sourceRectangle.Right/2 + player.location.X
+                        && enemies[i].projectiles[j].Location.Y >= player.sourceRectangle.Top - 20 + player.location.Y
+                        && enemies[i].projectiles[j].Location.Y <= player.sourceRectangle.Bottom/2 + player.location.Y)
+                    {
+                        if (player.PlayerShields < 0)
 
-                    {
-                        player.PlayerHP -= 10;
+                        {
+                            player.PlayerHP -= enemies[i].Damage;
+                        }
+                        else
+                        {
+                            player.PlayerShields -= enemies[i].Damage;
+                        }
+                        enemies[i].projectiles.Remove(enemies[i].projectiles[j]);
+                        return;
                     }
-                    else
-                    {
-                        player.PlayerShields -= 10;
-                    }
-                    projectiles.Remove(projectiles[i]);
-                    return;
                 }
             }
         }

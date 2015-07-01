@@ -18,8 +18,6 @@ namespace Flyer.Interfaces
 
         bool ToDraw { get; set; }
 
-        int Damage { get; set; }
-
         int Speed { get; set; }
 
         void SetPosition(Vector2 location);

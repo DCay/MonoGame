@@ -32,26 +32,48 @@ namespace Flyer.Factories
         }
 
         public static List<Enemy> ProcedureBuild(Texture2D texture, List<Enemy> list, Vector2 location,
-            Texture2D projectileTexture,GameTime gameTime)
+            Texture2D projectileTexture, GameTime gameTime)
         {
+            if (gameTime.TotalGameTime.TotalMinutes > 1) listLimit = 0;
             spawnTimer++;
-            if (spawnTimer > 10)
+            if (gameTime.TotalGameTime.TotalMinutes < 1)
             {
-                if (listLimit < 150)
+                if (spawnTimer > 10)
                 {
-                    var nextDrone = new Dron(texture, projectileTexture);
-
-                    if (Math.Sqrt((nextDrone.Location.X - location.X)*(nextDrone.Location.X - location.X) +
-                                  (nextDrone.Location.Y - location.Y)*(nextDrone.Location.Y - location.Y)) > 1400)
+                    if (listLimit < 150)
                     {
-                        list.Add(nextDrone);
-                        listLimit++;
+                        var nextDrone = new Dron(texture, projectileTexture);
+
+                        if (Math.Sqrt((nextDrone.Location.X - location.X)*(nextDrone.Location.X - location.X) +
+                                      (nextDrone.Location.Y - location.Y)*(nextDrone.Location.Y - location.Y)) > 1400)
+                        {
+                            list.Add(nextDrone);
+                            listLimit++;
+                        }
                     }
+                    spawnTimer = 0;
                 }
-                spawnTimer = 0;
             }
-            return list;   
-        } 
-    
+            else
+            {
+                if (spawnTimer > 10)
+                {
+                    if (listLimit < 50)
+                    {
+                        var nextInvader = new Invader(texture, projectileTexture);
+
+                        if (Math.Sqrt((nextInvader.Location.X - location.X)*(nextInvader.Location.X - location.X) +
+                                      (nextInvader.Location.Y - location.Y)*(nextInvader.Location.Y - location.Y)) >
+                            1400)
+                        {
+                            list.Add(nextInvader);
+                            listLimit++;
+                        }
+                    }
+                    spawnTimer = 0;
+                }
+            }
+            return list;
+        }
     }
 }
