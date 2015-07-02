@@ -8,6 +8,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Flyer.Core
 {
+    /// <summary>
+    /// THIS CLASS'S MAIN FUNCTION IS TO DRAW AND HANDLE THE
+    /// SECOND-PRIORITY DATA AND TO CLEAR THE ENGINE OF IT
+    /// </summary>
     public static class Outsiders
     {
         public static int detailReload = 0;
