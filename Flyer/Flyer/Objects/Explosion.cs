@@ -40,7 +40,7 @@ namespace Flyer.Objects
         {
             if (toDraw)
             {
-                spriteBatch.Draw(this.Texture,Location,Color.White);
+                spriteBatch.Draw(this.Texture, Location, Color.White);
             }
         }
     }
