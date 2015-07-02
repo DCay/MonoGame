@@ -25,7 +25,7 @@ namespace Flyer
         SpriteBatch spriteBatch;
         private Texture2D background;
         private SpriteFont universalFont;
-
+        private Texture2D endScreen;
 
         //PLAYER DATA
         private Ship newShip;
@@ -56,7 +56,8 @@ namespace Flyer
 
         //BONUS DATA
         private Texture2D upgradeTexture;
-        private List<WeaponUpgrade> newUpgrades; 
+        private Texture2D upgradeTexture2;
+        private List<IBonus> newUpgrades; 
 
         //JUNK DATA
         private int universalReload = 0;
@@ -67,7 +68,9 @@ namespace Flyer
         private Texture2D bluebar;
         private double redBarIndex=195;
         private double blueBarIndex = 190;
-
+        public static bool fuN = false;
+        private bool toDrawFun = false;
+        private int finished = 0;
 
         public Engine()
         {
@@ -92,7 +95,7 @@ namespace Flyer
             newMines = new List<Enemy>();
             newDrones = new List<Enemy>();
             newInvaders = new List<Enemy>();
-            newUpgrades=new List<WeaponUpgrade>();
+            newUpgrades=new List<IBonus>();
             newExplosions = new List<Explosion>();
             base.Initialize();
         }
@@ -106,7 +109,8 @@ namespace Flyer
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = Content.Load<Texture2D>("images/background3");
-            
+            endScreen = Content.Load<Texture2D>("images/gameover");
+
             //SHIP DATA
             Texture2D shipTexture = Content.Load<Texture2D>("images/ship");
             List<Texture2D> textures = new List<Texture2D>();
@@ -128,6 +132,7 @@ namespace Flyer
 
             //BONUS DATA
             upgradeTexture = Content.Load<Texture2D>("images/weaponupgrade");
+            upgradeTexture2 = Content.Load<Texture2D>("images/shield");
 
             //FONT DATA
             universalFont = Content.Load<SpriteFont>("UniversalFont");
@@ -142,7 +147,7 @@ namespace Flyer
             blackBallTexture = Content.Load<Texture2D>("images/blackBall");
             var mineTexture = Content.Load<Texture2D>("images/mine");
             EnemyFactory.Build(mineTexture, newMines, newShip.location);
-            BattleManager.Initialise(explosionTexture,upgradeTexture);
+            BattleManager.Initialise(explosionTexture,upgradeTexture,upgradeTexture2);
         }
 
         /// <summary>
@@ -161,9 +166,17 @@ namespace Flyer
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (fuN)
+            {
+                toDrawFun = true;
+                newExplosions.Add(new Explosion(explosionTexture,newShip.location));
+                Thread.Sleep(100);
+                finished++;
+                fuN = true;
+            }
             if (isOn)
             {
-                newShip.PlayerHP = 100;
+                newShip.HitPoints = 100;
             }
             EnemyFactory.gameTime = gameTime;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -171,13 +184,13 @@ namespace Flyer
             KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.B))
             {
-                if (isOn==true)
+                if (isOn)
                 {
-                    isOn = false;
+                    isOn = !isOn;
                 }
                 else
                 {
-                    isOn = true;
+                    isOn = !isOn;
                 }
             }
             CameraCheck();
@@ -227,8 +240,8 @@ namespace Flyer
             {
                 newExplosions[i].Update();
             }
-            redBarIndex = (195 * newShip.PlayerHP) / 100;
-            blueBarIndex = (190 * newShip.PlayerShields) / 200;
+            redBarIndex = (195 * newShip.HitPoints) / 100;
+            blueBarIndex = (190 * newShip.ShieldPoints) / 200;
             Outsiders.Update(state);
             base.Update(gameTime);
         }
@@ -240,46 +253,63 @@ namespace Flyer
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin(SpriteSortMode.Deferred,BlendState.AlphaBlend,null,null,null,null,camera.Transform);
-            spriteBatch.Draw(background, new Rectangle(0,0, 5000, 5000), Color.White);
-            newShip.Draw(spriteBatch);
-            
-            //LIST DRAWING
-            //UPGRADES
-            for (int i = 0; i < newUpgrades.Count; i++)
+            if (finished<5)
             {
-                newUpgrades[i].Draw(spriteBatch);
-            }
-            //MINES
-            for (int i = 0; i < newMines.Count; i++)
-            {
-                newMines[i].Draw(spriteBatch);
-            }
-            //DRONES
-            for (int i = 0; i < newDrones.Count; i++)
-            {
-                newDrones[i].Draw(spriteBatch);
-            }
-            if (EnemyFactory.gameTime.TotalGameTime.TotalMinutes > 1)
-            {
-                for (int i = 0; i < newInvaders.Count; i++)
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null,
+                    camera.Transform);
+                spriteBatch.Draw(background, new Rectangle(0, 0, 5000, 5000), Color.White);
+                if (toDrawFun)
                 {
-                    newInvaders[i].Draw(spriteBatch);
+                    spriteBatch.DrawString(universalFont, newShip.WayToDie, new Vector2(newShip.Location.X-50, newShip.Location.Y - 150), Color.White);
                 }
-            }
-            //EXPLOSIONS
-            for (int i = 0; i < newExplosions.Count; i++)
-            {
-                newExplosions[i].Draw(spriteBatch);
-            }
-            spriteBatch.End();
-            spriteBatch.Begin();
-            spriteBatch.DrawString(score_font,"Score : " + newShip.playerScore,new Vector2(graphics.PreferredBackBufferWidth-150,20),Color.White);
-            //THE BULLSHIT METHOD !!!
-            Outsiders.Draw(spriteBatch,universalFont,newShip.location,playerHPbar,redbar,bluebar,redBarIndex,blueBarIndex);
-            //END OF BULLSHIT !!!
-            spriteBatch.End();
+                newShip.Draw(spriteBatch);
 
+                //LIST DRAWING
+                //UPGRADES
+                for (int i = 0; i < newUpgrades.Count; i++)
+                {
+                    newUpgrades[i].Draw(spriteBatch);
+                }
+                //MINES
+                for (int i = 0; i < newMines.Count; i++)
+                {
+                    newMines[i].Draw(spriteBatch);
+                }
+                //DRONES
+                for (int i = 0; i < newDrones.Count; i++)
+                {
+                    newDrones[i].Draw(spriteBatch);
+                }
+                if (EnemyFactory.gameTime.TotalGameTime.TotalMinutes > 1)
+                {
+                    for (int i = 0; i < newInvaders.Count; i++)
+                    {
+                        newInvaders[i].Draw(spriteBatch);
+                    }
+                }
+                //EXPLOSIONS
+                for (int i = 0; i < newExplosions.Count; i++)
+                {
+                    newExplosions[i].Draw(spriteBatch);
+                }
+                spriteBatch.End();
+                spriteBatch.Begin();
+                spriteBatch.DrawString(score_font, "Score : " + newShip.playerScore,
+                    new Vector2(graphics.PreferredBackBufferWidth - 150, 20), Color.White);
+                //THE BULLSHIT METHOD !!!
+                Outsiders.Draw(spriteBatch, universalFont, newShip.location, playerHPbar, redbar, bluebar, redBarIndex,
+                    blueBarIndex);
+                //END OF BULLSHIT !!!
+                spriteBatch.End();
+            }
+            else
+            {
+                spriteBatch.Begin();
+                spriteBatch.Draw(endScreen,new Rectangle(0,0,1366,768),Color.White);
+                spriteBatch.DrawString(universalFont,"Your Score - " + newShip.playerScore,new Vector2(580,550),Color.White);
+                spriteBatch.End();
+                if(finished>20)Environment.Exit(0);
+            }
             base.Draw(gameTime);
         }
 
@@ -339,7 +369,7 @@ namespace Flyer
                     && (newShip.location.Y <= newUpgrades[i].Location.Y + newUpgrades[i].Texture.Height / 2)
                     )
                 {
-                    newShip.ProjectileType = newUpgrades[i].Upgrade(newShip.ProjectileType);
+                    newUpgrades[i].Upgrade(newShip);
                     newUpgrades.Remove(newUpgrades[i]);
                 }
                 if (newShip.ProjectileType == "laser") newShip.ProjectileTexture = laserTexture;

@@ -34,12 +34,13 @@ namespace Flyer.Factories
         public static List<Enemy> ProcedureBuild(Texture2D texture, List<Enemy> list, Vector2 location,
             Texture2D projectileTexture, GameTime gameTime)
         {
-            if (gameTime.TotalGameTime.TotalMinutes > 1) listLimit = 0;
+            if (gameTime.TotalGameTime.TotalMinutes == 1) listLimit = 0;
             spawnTimer++;
             if (gameTime.TotalGameTime.TotalMinutes < 1)
             {
                 if (spawnTimer > 10)
                 {
+                    listLimit = list.Count();
                     if (listLimit < 150)
                     {
                         var nextDrone = new Dron(texture, projectileTexture);
@@ -58,6 +59,7 @@ namespace Flyer.Factories
             {
                 if (spawnTimer > 10)
                 {
+                    listLimit=list.Count();
                     if (listLimit < 50)
                     {
                         var nextInvader = new Invader(texture, projectileTexture);

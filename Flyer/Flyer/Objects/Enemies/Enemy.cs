@@ -8,10 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Flyer.Interfaces;
+using IDrawable = Flyer.Interfaces.IDrawable;
 
 namespace Flyer.Enemies
 {
-    public abstract class Enemy : IDestroyable,IAttack
+    public abstract class Enemy : IDestroyable,IAttack,IDrawable
     {
         public Texture2D ProjectileTexture { get; set; }
         private int projectileIndex = 0;

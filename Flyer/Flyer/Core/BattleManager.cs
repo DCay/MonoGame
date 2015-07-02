@@ -8,6 +8,7 @@ using Flyer.Bonuses;
 using Flyer.Enemies;
 using Flyer.Interfaces;
 using Flyer.Objects;
+using Flyer.Objects.Bonuses;
 using Flyer.Projectiles;
 using Flyer.Projectiles.EnemyProjectiles;
 using Microsoft.Xna.Framework;
@@ -19,15 +20,16 @@ namespace Flyer.Core
     {
         private static Texture2D ExplosionTexture;
         private static Texture2D UpgradeTexture;
+        private static Texture2D UpgradeTexture2;
 
-
-        public static void Initialise(Texture2D explosionTexture,Texture2D upgradeTexture)
+        public static void Initialise(Texture2D explosionTexture, Texture2D upgradeTexture, Texture2D upgradeTexture2)
         {
             ExplosionTexture = explosionTexture;
             UpgradeTexture = upgradeTexture;
+            UpgradeTexture2 = upgradeTexture2;
         }
 
-        public static void CheckHitStatus(Ship player,List<Enemy> enemies,List<Explosion> explosions,List<WeaponUpgrade> upgrades)
+        public static void CheckHitStatus(Ship player,List<Enemy> enemies,List<Explosion> explosions,List<IBonus> upgrades)
         {
             for (int i = 0; i < enemies.Count; i++)
             {
@@ -39,7 +41,10 @@ namespace Flyer.Core
                         && (player.projectiles[j].Location.Y <= enemies[i].Location.Y + enemies[i].Texture.Height/2)
                         )
                     {
-                        player.projectiles.Remove(player.projectiles[j]);
+                        if (player.projectiles[j].GetType().Name != "PlasmaProjectile")
+                        {
+                            player.projectiles.Remove(player.projectiles[j]);
+                        }
                         Random chanceToDrop = new Random();
                         enemies[i].HitPoints -= player.Damage;
                         if (enemies[i].HitPoints <= 0)
@@ -49,20 +54,35 @@ namespace Flyer.Core
                             explosions.Add(new Explosion(ExplosionTexture, enemies[i].location));
                             //EXPLOSION
                             int explosionIndex = explosions.Count - 1;
-                            explosions[explosionIndex].Location =
+                            if (enemies[i].GetType().Name != "Invader")
+                            {
+                                explosions[explosionIndex].Location =
                                 new Vector2((enemies[i].Location.X - enemies[i].Texture.Width)
                                     , (enemies[i].Location.Y - enemies[i].Texture.Height));
+    
+                            }
+                            else
+                            {
+                                explosions[explosionIndex].Location =
+                                new Vector2((enemies[i].Location.X)
+                                    , (enemies[i].Location.Y));
 
+                            }                            
                             //LOOT
-                            int isDroped = chanceToDrop.Next(20);
+                            int isDroped = chanceToDrop.Next(40);
                             switch (isDroped)
                             {
                                 case 1:
                                     upgrades.Add(new WeaponUpgrade(UpgradeTexture, enemies[i].Location));
                                     break;
-                                case 8:
+                                case 15:
+                                    upgrades.Add(new WeaponUpgrade(UpgradeTexture, enemies[i].Location));
                                     break;
-                                default:
+                                case 35:
+                                    upgrades.Add(new WeaponUpgrade(UpgradeTexture, enemies[i].Location));
+                                    break;
+                                case 20:
+                                    upgrades.Add(new ShieldRegenerate(UpgradeTexture2,enemies[i].Location));
                                     break;
                             }
                             //END LOOT
@@ -89,17 +109,32 @@ namespace Flyer.Core
                     player.playerScore += 10;
                     explosions.Add(new Explosion(ExplosionTexture,enemies[i].location));
                     int explosionIndex = explosions.Count - 1;
-                    explosions[explosionIndex].Location = new Vector2((enemies[i].Location.X - enemies[i].Texture.Width)
-                        , (enemies[i].Location.Y - enemies[i].Texture.Height));
-                    enemies.Remove(enemies[i]);
-                    if (player.PlayerShields <= 0)
+
+                    if (enemies[i].GetType().Name != "Invader")
                     {
-                        player.PlayerHP -= enemies[i].Damage+20;
+                        explosions[explosionIndex].Location =
+                        new Vector2((enemies[i].Location.X - enemies[i].Texture.Width)
+                            , (enemies[i].Location.Y - enemies[i].Texture.Height));
+
                     }
                     else
                     {
-                        player.PlayerShields -= enemies[i].Damage+20;
+                        explosions[explosionIndex].Location =
+                        new Vector2((enemies[i].Location.X)
+                            , (enemies[i].Location.Y));
+
+                    }     
+
+                    enemies.Remove(enemies[i]);
+                    if (player.ShieldPoints <= 0)
+                    {
+                        player.HitPoints -= enemies[i].Damage+20;
                     }
+                    else
+                    {
+                        player.ShieldPoints -= enemies[i].Damage+20;
+                    }
+                    player.WayToDie = "Allahu Akbar ! ! !";
                     return true;
                 }
             }
@@ -117,16 +152,17 @@ namespace Flyer.Core
                         && enemies[i].projectiles[j].Location.Y >= player.sourceRectangle.Top - 20 + player.location.Y
                         && enemies[i].projectiles[j].Location.Y <= player.sourceRectangle.Bottom/2 + player.location.Y)
                     {
-                        if (player.PlayerShields < 0)
+                        if (player.ShieldPoints < 0)
 
                         {
-                            player.PlayerHP -= enemies[i].Damage;
+                            player.HitPoints -= enemies[i].Damage;
                         }
                         else
                         {
-                            player.PlayerShields -= enemies[i].Damage;
+                            player.ShieldPoints -= enemies[i].Damage;
                         }
                         enemies[i].projectiles.Remove(enemies[i].projectiles[j]);
+                        player.WayToDie = "Rest In Pieces...";
                         return;
                     }
                 }

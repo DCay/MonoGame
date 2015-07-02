@@ -65,11 +65,9 @@ namespace Flyer
             for (int i = 0; i < particles.Count; i++)
             {
                 particles[i].Update();
-                if (particles[i].Lifespan <= 0)
-                {
-                    particles.RemoveAt(i);
-                    i--;
-                }
+                int d = particles.FindAll(p => p.Lifespan <= 0).Count;
+                particles.RemoveAll(p => p.Lifespan <= 0);
+                i-=d;
             }
         }
         public void Draw(SpriteBatch spriteBatch)

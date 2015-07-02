@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Flyer.Interfaces
 {
-    public abstract class Projectile : IProjectile
+    public abstract class Projectile : IProjectile,IDrawable
     {
         protected Vector2 location;
         private float angle;
@@ -17,15 +17,16 @@ namespace Flyer.Interfaces
         protected Projectile(Texture2D texture, Vector2 location, Direction direction)
         {
             this.Texture = texture;
-            this.location = location;
+            this.Location = location;
             this.Direction = direction;
             this.ToDraw = true;
             this.angle = angle;
         }
 
         public bool ToDraw { get; set; }
-        public Texture2D Texture { get; private set; }
+        public Texture2D Texture { get; set; }
         public Direction Direction { get; private set; }
+
         public Vector2 Location
         { 
             get { return this.location; }
